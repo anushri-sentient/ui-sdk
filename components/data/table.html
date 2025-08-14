@@ -1,0 +1,135 @@
+<!-- Table Component -->
+<div class="demo-section">
+    <h2 class="demo-title">2. Enhanced Table Component</h2>
+    <ui-table 
+        headers="Name,Email,Role,Status,Last Active"
+        rows="John Doe,john@example.com,Senior Developer,Active,2 hours ago;Jane Smith,jane@example.com,UI Designer,Active,1 hour ago;Bob Johnson,bob@example.com,Product Manager,Inactive,3 days ago;Alice Brown,alice@example.com,Frontend Developer,Pending,5 minutes ago"
+        striped="true"
+        hoverable="true"
+        compact="false">
+    </ui-table>
+</div>
+
+<style>
+ui-table {
+    display: block;
+    width: 100%;
+    margin: 2rem 0;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: var(--radius-size);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: var(--shadow-soft);
+    overflow: hidden;
+}
+
+ui-table table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+ui-table th,
+ui-table td {
+    padding: 1.25rem 1.5rem;
+    text-align: left;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.3s var(--animation-smooth);
+}
+
+ui-table th {
+    background: var(--gradient-primary);
+    color: white;
+    font-weight: 600;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+ui-table tbody tr {
+    transition: all 0.3s var(--animation-smooth);
+}
+
+ui-table tbody tr:hover {
+    background: rgba(var(--brand-hue), 80%, 60%, 0.05);
+    transform: scale(1.01);
+}
+
+ui-table.striped tbody tr:nth-child(even) {
+    background: rgba(0, 0, 0, 0.02);
+}
+
+ui-table.striped tbody tr:nth-child(even):hover {
+    background: rgba(var(--brand-hue), 80%, 60%, 0.08);
+}
+
+ui-table .status-badge {
+    padding: 0.25rem 0.75rem;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+ui-table .status-active {
+    background: var(--gradient-success);
+    color: white;
+}
+
+ui-table .status-inactive {
+    background: var(--gradient-danger);
+    color: white;
+}
+
+ui-table .status-pending {
+    background: var(--gradient-warning);
+    color: white;
+}
+</style>
+
+<script>
+// Table Component Initialization
+function initTables() {
+    document.querySelectorAll('ui-table').forEach(table => {
+        const headers = table.getAttribute('headers').split(',');
+        const rows = table.getAttribute('rows').split(';');
+        const striped = table.getAttribute('striped') === 'true';
+        const hoverable = table.getAttribute('hoverable') !== 'false';
+        const compact = table.getAttribute('compact') === 'true';
+
+        if (striped) table.classList.add('striped');
+        if (hoverable) table.classList.add('hoverable');
+        if (compact) table.classList.add('compact');
+
+        let tableHTML = '<table><thead><tr>';
+        headers.forEach(header => {
+            tableHTML += `<th>${header.trim()}</th>`;
+        });
+        tableHTML += '</tr></thead><tbody>';
+
+        rows.forEach(row => {
+            const cells = row.split(',');
+            tableHTML += '<tr>';
+            cells.forEach((cell, index) => {
+                const cellContent = cell.trim();
+                // Check if cell contains status-like content
+                if (cellContent.toLowerCase().includes('active') || 
+                    cellContent.toLowerCase().includes('inactive') || 
+                    cellContent.toLowerCase().includes('pending')) {
+                    const statusClass = cellContent.toLowerCase().includes('active') ? 'status-active' :
+                                      cellContent.toLowerCase().includes('inactive') ? 'status-inactive' : 'status-pending';
+                    tableHTML += `<td><span class="status-badge ${statusClass}">${cellContent}</span></td>`;
+                } else {
+                    tableHTML += `<td>${cellContent}</td>`;
+                }
+            });
+            tableHTML += '</tr>';
+        });
+
+        tableHTML += '</tbody></table>';
+        table.innerHTML = tableHTML;
+    });
+}
+
+// Initialize tables when DOM is loaded
+document.addEventListener('DOMContentLoaded', initTables);
+</script> 

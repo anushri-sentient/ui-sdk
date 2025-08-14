@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="https://unpkg.com/chota@latest">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="components/component-styles.css">
+    <script src="components/simple-components.js"></script>
     <style>
         @import "https://unpkg.com/open-props";
         
@@ -292,6 +293,18 @@
                 <div class="form-group">
                     <label for="accordionItems">Items (JSON format)</label>
                     <textarea id="accordionItems" placeholder='[{"title":"Section 1","content":"Content for section 1"},{"title":"Section 2","content":"Content for section 2"}]'>[{"title":"What is this component library?","content":"A modern UI component library built with Chota CSS and Open Props, featuring reusable components with multiple usage patterns."},{"title":"How do I get started?","content":"Check out the Quick Start Guide or try the Visual Builder to create components without writing code."},{"title":"Is it responsive?","content":"Yes! All components are fully responsive and work perfectly on desktop, tablet, and mobile devices."}]</textarea>
+                </div>
+            </div>
+
+            <!-- Carousel Form -->
+            <div id="carouselForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="carouselImages">Images (comma-separated URLs):</label>
+                    <input type="text" id="carouselImages" value="https://picsum.photos/400/200?random=1,https://picsum.photos/400/200?random=2" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="carouselInterval">Auto-rotate Interval (ms):</label>
+                    <input type="number" id="carouselInterval" value="3000" min="1000" step="500" class="form-control">
                 </div>
             </div>
 
@@ -781,6 +794,20 @@
                 const form = document.getElementById(componentType + 'Form');
                 if (form) {
                     form.classList.remove('hidden');
+                    // Add event listeners to the newly shown form
+                    setTimeout(() => {
+                        const formInputs = form.querySelectorAll('input, textarea, select');
+                        formInputs.forEach(input => {
+                            if (input.id === 'componentType') return;
+                            
+                            if (input.type === 'checkbox') {
+                                input.addEventListener('change', generateComponent);
+                            } else {
+                                input.addEventListener('input', generateComponent);
+                                input.addEventListener('change', generateComponent);
+                            }
+                        });
+                    }, 100);
                 }
             }
         }
@@ -913,11 +940,67 @@
 
             // Update preview
             const previewContainer = document.getElementById('previewContainer');
-            previewContainer.innerHTML = `<div class="component-preview">${html}</div>`;
+            previewContainer.innerHTML = ''; // Clear previous content
+            
+            // Check if component is registered
+            const componentName = `ui-${componentType}`;
+            console.log(`🔍 Checking for component: ${componentName}`);
+            
+            // Safely get available components
+            let availableComponents = [];
+            try {
+                if (customElements.registry) {
+                    availableComponents = Array.from(customElements.registry.keys()).filter(key => key.startsWith('ui-'));
+                }
+            } catch (e) {
+                console.warn('Could not access customElements.registry:', e);
+            }
+            console.log(`📋 Available components:`, availableComponents);
+            
+            if (customElements.get(componentName)) {
+                console.log(`✅ Component ${componentName} found, creating element`);
+                
+                // Create the actual custom element
+                const componentElement = document.createElement(componentName);
+                
+                // Set attributes
+                if (attributes) {
+                    // Parse attributes properly, handling quoted values with spaces
+                    const attrRegex = /(\w+)="([^"]*)"|(\w+)='([^']*)'/g;
+                    let match;
+                    while ((match = attrRegex.exec(attributes)) !== null) {
+                        const name = match[1] || match[3];
+                        const value = (match[2] || match[4]).replace(/&quot;/g, '"');
+                        componentElement.setAttribute(name, value);
+                    }
+                }
+                
+                // Add to preview container
+                const previewDiv = document.createElement('div');
+                previewDiv.className = 'component-preview';
+                previewDiv.appendChild(componentElement);
+                previewContainer.appendChild(previewDiv);
+                
+                console.log(`Created component: ${componentName}`, componentElement);
+            } else {
+                // Component not registered - show HTML preview
+                console.warn(`❌ Component ${componentName} not registered, showing HTML preview`);
+                previewContainer.innerHTML = `
+                    <div class="component-preview">
+                        <div style="background: #fef3c7; border: 1px solid #f59e0b; padding: 1rem; border-radius: 0.5rem; margin-bottom: 1rem;">
+                            <strong>⚠️ Component Not Available</strong><br>
+                            The ${componentName} component is not currently registered. This might be due to a JavaScript error during component initialization.
+                        </div>
+                        <div style="background: #1f2937; color: #f9fafb; padding: 1rem; border-radius: 0.5rem; font-family: monospace; font-size: 0.9rem;">
+                            &lt;${componentName} ${attributes}&gt;&lt;/${componentName}&gt;
+                        </div>
+                    </div>
+                `;
+            }
             
             // Show code output
             const codeOutput = document.getElementById('codeOutput');
-            codeOutput.textContent = `<ui-${componentType} ${attributes}></ui-${componentType}>`;
+            codeOutput.textContent = `<${componentName} ${attributes}></${componentName}>`;
             codeOutput.classList.remove('hidden');
             
             // Show copy button
@@ -935,11 +1018,11 @@
             const designVariant = document.getElementById('cardDesignVariant').value;
 
             let attrs = [];
-            if (title) attrs.push(`title="${title}"`);
-            if (subtitle) attrs.push(`subtitle="${subtitle}"`);
+            if (title) attrs.push(`title="${title.replace(/"/g, '&quot;')}"`);
+            if (subtitle) attrs.push(`subtitle="${subtitle.replace(/"/g, '&quot;')}"`);
             if (image) attrs.push(`image="${image}"`);
-            if (content) attrs.push(`content="${content}"`);
-            if (actionText) attrs.push(`actionText="${actionText}"`);
+            if (content) attrs.push(`content="${content.replace(/"/g, '&quot;')}"`);
+            if (actionText) attrs.push(`actionText="${actionText.replace(/"/g, '&quot;')}"`);
             if (variant) attrs.push(`variant="${variant}"`);
             if (size) attrs.push(`size="${size}"`);
             if (designVariant && designVariant !== 'default') attrs.push(`designVariant="${designVariant}"`);
@@ -948,25 +1031,8 @@
         }
 
         function generateCardHTML() {
-            const title = document.getElementById('cardTitle').value;
-            const subtitle = document.getElementById('cardSubtitle').value;
-            const image = document.getElementById('cardImage').value;
-            const content = document.getElementById('cardContent').value;
-            const actionText = document.getElementById('cardActionText').value;
-            const designVariant = document.getElementById('cardDesignVariant').value;
-
-            return `
-                <ui-card class="${designVariant !== 'default' ? designVariant : ''}">
-                    ${image ? `<img src="${image}" alt="${title}" class="card-image">` : ''}
-                    <div class="card-content">
-                        <span class="card-badge">New</span>
-                        <h3 class="card-title">${title}</h3>
-                        ${subtitle ? `<p class="card-subtitle">${subtitle}</p>` : ''}
-                        <p class="card-text">${content}</p>
-                        ${actionText ? `<a href="#" class="card-action">${actionText}</a>` : ''}
-                    </div>
-                </ui-card>
-            `;
+            // Return empty string - the component will handle its own HTML generation
+            return '';
         }
 
         function generateTableAttributes() {
@@ -975,75 +1041,31 @@
             const striped = document.getElementById('tableStriped').value;
 
             let attrs = [];
-            if (headers) attrs.push(`headers="${headers}"`);
-            if (rows) attrs.push(`rows="${rows}"`);
+            if (headers) attrs.push(`headers="${headers.replace(/"/g, '&quot;')}"`);
+            if (rows) attrs.push(`rows="${rows.replace(/"/g, '&quot;')}"`);
             if (striped) attrs.push(`striped="${striped}"`);
 
             return attrs.join(' ');
         }
 
         function generateTableHTML() {
-            const headers = document.getElementById('tableHeaders').value;
-            const rows = document.getElementById('tableRows').value;
-            const striped = document.getElementById('tableStriped').value;
-
-            const headerArray = headers.split(',').map(h => h.trim());
-            const rowArray = rows.split(';').map(row => row.split(',').map(cell => cell.trim()));
-
-            let tableHTML = '<ui-table>';
-            tableHTML += '<table class="' + (striped === 'true' ? 'table-striped' : '') + '">';
-
-            if (headerArray.length > 0) {
-                tableHTML += '<thead><tr>';
-                headerArray.forEach(header => {
-                    tableHTML += `<th>${header}</th>`;
-                });
-                tableHTML += '</tr></thead>';
-            }
-
-            if (rowArray.length > 0) {
-                tableHTML += '<tbody>';
-                rowArray.forEach(row => {
-                    tableHTML += '<tr>';
-                    row.forEach(cell => {
-                        tableHTML += `<td>${cell}</td>`;
-                    });
-                    tableHTML += '</tr>';
-                });
-                tableHTML += '</tbody>';
-            }
-
-            tableHTML += '</table></ui-table>';
-            return tableHTML;
+            // Return empty string - the component will handle its own HTML generation
+            return '';
         }
 
         function generateAccordionAttributes() {
             const items = document.getElementById('accordionItems').value;
             if (items) {
-                return `items='${items}'`;
+                // Properly escape JSON for HTML attributes
+                const escapedItems = items.replace(/"/g, '&quot;');
+                return `items="${escapedItems}"`;
             }
             return '';
         }
 
         function generateAccordionHTML() {
-            const items = JSON.parse(document.getElementById('accordionItems').value || '[]');
-
-            let accordionHTML = '<ui-accordion><div class="accordion">';
-            items.forEach((item, index) => {
-                accordionHTML += `
-                    <div class="accordion-item">
-                        <div class="accordion-header" onclick="this.nextElementSibling.classList.toggle('active')">
-                            ${item.title}
-                        </div>
-                        <div class="accordion-content ${index === 0 ? 'active' : ''}">
-                            ${item.content}
-                        </div>
-                    </div>
-                `;
-            });
-            accordionHTML += '</div></ui-accordion>';
-            
-            return accordionHTML;
+            // Return empty string - the component will handle its own HTML generation
+            return '';
         }
 
         function generateAlertAttributes() {
@@ -1053,22 +1075,15 @@
 
             let attrs = [];
             if (type) attrs.push(`type="${type}"`);
-            if (message) attrs.push(`message="${message}"`);
+            if (message) attrs.push(`message="${message.replace(/"/g, '&quot;')}"`);
             if (duration) attrs.push(`duration="${duration}"`);
 
             return attrs.join(' ');
         }
 
         function generateAlertHTML() {
-            const type = document.getElementById('alertType').value;
-            const message = document.getElementById('alertMessage').value;
-
-            return `
-                <ui-alert class="alert-${type}">
-                    <span class="alert-message">${message}</span>
-                    <button class="alert-close" onclick="this.parentElement.remove()">×</button>
-                </ui-alert>
-            `;
+            // Return empty string - the component will handle its own HTML generation
+            return '';
         }
 
         function generateBadgeAttributes() {
@@ -1077,7 +1092,7 @@
             const designVariant = document.getElementById('badgeDesignVariant').value;
 
             let attrs = [];
-            if (label) attrs.push(`label="${label}"`);
+            if (label) attrs.push(`label="${label.replace(/"/g, '&quot;')}"`);
             if (color) attrs.push(`color="${color}"`);
             if (designVariant && designVariant !== 'default') attrs.push(`designVariant="${designVariant}"`);
 
@@ -1085,11 +1100,8 @@
         }
 
         function generateBadgeHTML() {
-            const label = document.getElementById('badgeLabel').value;
-            const color = document.getElementById('badgeColor').value;
-            const designVariant = document.getElementById('badgeDesignVariant').value;
-
-            return `<ui-badge class="badge-${color} ${designVariant !== 'default' ? designVariant : ''}">${label}</ui-badge>`;
+            // Return empty string - the component will handle its own HTML generation
+            return '';
         }
 
         function generateAvatarAttributes() {
@@ -1097,16 +1109,15 @@
             const size = document.getElementById('avatarSize').value;
 
             let attrs = [];
-            if (src) attrs.push(`src="${src}"`);
+            if (src) attrs.push(`src="${src.replace(/"/g, '&quot;')}"`);
             if (size) attrs.push(`size="${size}"`);
 
             return attrs.join(' ');
         }
 
         function generateAvatarHTML() {
-            const src = document.getElementById('avatarSrc').value;
-
-            return `<ui-avatar>${src}</ui-avatar>`;
+            // Return empty string - the component will handle its own HTML generation
+            return '';
         }
 
         function generateChipsAttributes() {
@@ -1114,25 +1125,15 @@
             const color = document.getElementById('chipsColor').value;
 
             let attrs = [];
-            if (labels) attrs.push(`labels="${labels}"`);
+            if (labels) attrs.push(`labels="${labels.replace(/"/g, '&quot;')}"`);
             if (color) attrs.push(`color="${color}"`);
 
             return attrs.join(' ');
         }
 
         function generateChipsHTML() {
-            const labels = document.getElementById('chipsLabels').value;
-            const color = document.getElementById('chipsColor').value;
-
-            const labelArray = labels.split(',').map(l => l.trim());
-            
-            return `
-                <ui-chips>
-                    <div class="chips">
-                        ${labelArray.map(label => `<span class="chip">${label}</span>`).join('')}
-                    </div>
-                </ui-chips>
-            `;
+            // Return empty string - the component will handle its own HTML generation
+            return '';
         }
 
         function copyCode() {
@@ -1421,26 +1422,15 @@
 
             let attrs = [];
             if (question) attrs.push(`question="${question}"`);
-            if (options) attrs.push(`options='${options}'`);
+            if (options) attrs.push(`options="${options.replace(/"/g, '&quot;')}"`);
             if (theme) attrs.push(`theme="${theme}"`);
 
             return attrs.join(' ');
         }
 
         function generateQuizHTML() {
-            const question = document.getElementById('quizQuestion').value;
-            const options = JSON.parse(document.getElementById('quizOptions').value || '[]');
-            const theme = document.getElementById('quizTheme').value;
-
-            let html = `<ui-quiz class="${theme}">`;
-            html += `<div class="quiz-question">${question}</div>`;
-            html += '<div class="quiz-options">';
-            options.forEach(option => {
-                html += `<div class="quiz-option">${option.text}</div>`;
-            });
-            html += '</div></ui-quiz>';
-            
-            return html;
+            // Return empty string - the component will handle its own HTML generation
+            return '';
         }
 
         function generateKeypointsAttributes() {
@@ -1449,7 +1439,7 @@
             const confidence = document.getElementById('keypointsConfidence').value;
 
             let attrs = [];
-            if (items) attrs.push(`items='${items}'`);
+            if (items) attrs.push(`items="${items.replace(/"/g, '&quot;')}"`);
             if (updatedAt) attrs.push(`updatedAt="${updatedAt}"`);
             if (confidence) attrs.push(`confidence="${confidence}"`);
 
@@ -1457,24 +1447,8 @@
         }
 
         function generateKeypointsHTML() {
-            const items = JSON.parse(document.getElementById('keypointsItems').value || '[]');
-            const updatedAt = document.getElementById('keypointsUpdatedAt').value;
-            const confidence = document.getElementById('keypointsConfidence').value;
-
-            let html = '<ui-keypoints>';
-            if (confidence || updatedAt) {
-                html += '<div class="kp-header">';
-                if (confidence) html += `<span class="kp-badge">confidence: ${(Number(confidence)*100).toFixed(0)}%</span>`;
-                if (updatedAt) html += `<span class="kp-badge">updated ${updatedAt}</span>`;
-                html += '</div>';
-            }
-            html += '<div class="kp-list">';
-            items.forEach(item => {
-                html += `<div class="kp-item"><div class="kp-dot"></div><div class="kp-text">${item.text}</div></div>`;
-            });
-            html += '</div></ui-keypoints>';
-            
-            return html;
+            // Return empty string - the component will handle its own HTML generation
+            return '';
         }
 
         function generateTimelineAttributes() {
@@ -1482,48 +1456,28 @@
             const current = document.getElementById('timelineCurrent').value;
 
             let attrs = [];
-            if (items) attrs.push(`items='${items}'`);
+            if (items) attrs.push(`items="${items.replace(/"/g, '&quot;')}"`);
             if (current) attrs.push(`current="${current}"`);
 
             return attrs.join(' ');
         }
 
         function generateTimelineHTML() {
-            const items = JSON.parse(document.getElementById('timelineItems').value || '[]');
-            const current = parseInt(document.getElementById('timelineCurrent').value || '0');
-
-            let html = '<ui-timeline><div class="tl"><div class="line"></div>';
-            items.forEach((item, idx) => {
-                const status = item.status || (idx < current ? 'done' : idx === current ? 'current' : 'pending');
-                html += `<div class="row"><div class="dot ${status}"></div><div class="content"><div class="title">${item.title}</div><div class="detail">${item.detail}</div></div></div>`;
-            });
-            html += '</div></ui-timeline>';
-            
-            return html;
+            // Return empty string - the component will handle its own HTML generation
+            return '';
         }
 
         function generateResourcesAttributes() {
             const items = document.getElementById('resourcesItems').value;
             if (items) {
-                return `items='${items}'`;
+                return `items="${items.replace(/"/g, '&quot;')}"`;
             }
             return '';
         }
 
         function generateResourcesHTML() {
-            const items = JSON.parse(document.getElementById('resourcesItems').value || '[]');
-
-            let html = '<ui-resources><div class="resources-grid">';
-            items.forEach(item => {
-                html += `<div class="resource-item">
-                    <div class="resource-title">${item.title}</div>
-                    <div class="resource-description">${item.description}</div>
-                    <a href="${item.url}" class="resource-link">Learn More</a>
-                </div>`;
-            });
-            html += '</div></ui-resources>';
-            
-            return html;
+            // Return empty string - the component will handle its own HTML generation
+            return '';
         }
 
         function generateCodeBlockAttributes() {
@@ -1533,23 +1487,15 @@
 
             let attrs = [];
             if (title) attrs.push(`title="${title}"`);
-            if (content) attrs.push(`content="${content}"`);
+            if (content) attrs.push(`content="${content.replace(/"/g, '&quot;')}"`);
             if (language) attrs.push(`language="${language}"`);
 
             return attrs.join(' ');
         }
 
         function generateCodeBlockHTML() {
-            const title = document.getElementById('codeBlockTitle').value;
-            const content = document.getElementById('codeBlockContent').value;
-            const language = document.getElementById('codeBlockLanguage').value;
-
-            let html = '<ui-code-block><div class="code-container">';
-            html += `<div class="code-header"><div class="code-title">${title}</div><div class="code-actions"><button class="code-action">Copy</button></div></div>`;
-            html += `<div class="code-content">${content}</div>`;
-            html += '</div></ui-code-block>';
-            
-            return html;
+            // Return empty string - the component will handle its own HTML generation
+            return '';
         }
 
 
@@ -1559,44 +1505,28 @@
         function generateSuggestionsAttributes() {
             const items = document.getElementById('suggestionsItems').value;
             if (items) {
-                return `items="${items}"`;
+                return `items="${items.replace(/"/g, '&quot;')}"`;
             }
             return '';
         }
 
         function generateSuggestionsHTML() {
-            const items = document.getElementById('suggestionsItems').value.split(',').map(item => item.trim());
-
-            let html = '<ui-suggestions><div class="suggestions-list">';
-            items.forEach(item => {
-                html += `<div class="suggestion-item">${item}</div>`;
-            });
-            html += '</div></ui-suggestions>';
-            
-            return html;
+            // Return empty string - the component will handle its own HTML generation
+            return '';
         }
 
         function generateScrollytellingAttributes() {
             const steps = document.getElementById('scrollytellingSteps').value;
             if (steps) {
-                return `steps='${steps}'`;
+                const escapedSteps = steps.replace(/"/g, '&quot;');
+                return `steps="${escapedSteps}"`;
             }
             return '';
         }
 
         function generateScrollytellingHTML() {
-            const steps = JSON.parse(document.getElementById('scrollytellingSteps').value || '[]');
-
-            let html = '<ui-scrollytelling><div class="scroll-container">';
-            steps.forEach(step => {
-                html += `<div class="scroll-step">
-                    <h3>${step.title}</h3>
-                    <p>${step.content}</p>
-                </div>`;
-            });
-            html += '</div></ui-scrollytelling>';
-            
-            return html;
+            // Return empty string - the component will handle its own HTML generation
+            return '';
         }
 
         function generateLyricAttributes() {
@@ -1604,84 +1534,55 @@
             const author = document.getElementById('lyricAuthor').value;
 
             let attrs = [];
-            if (text) attrs.push(`text="${text}"`);
-            if (author) attrs.push(`author="${author}"`);
+            if (text) attrs.push(`text="${text.replace(/"/g, '&quot;')}"`);
+            if (author) attrs.push(`author="${author.replace(/"/g, '&quot;')}"`);
 
             return attrs.join(' ');
         }
 
         function generateLyricHTML() {
-            const text = document.getElementById('lyricText').value;
-            const author = document.getElementById('lyricAuthor').value;
-
-            let html = '<ui-lyric>';
-            html += `<div class="lyric-text">${text}</div>`;
-            html += `<div class="lyric-author">${author}</div>`;
-            html += '</ui-lyric>';
-            
-            return html;
+            // Return empty string - the component will handle its own HTML generation
+            return '';
         }
 
         function generateCardStackAttributes() {
             const items = document.getElementById('cardStackItems').value;
             if (items) {
-                return `items='${items}'`;
+                const escapedItems = items.replace(/"/g, '&quot;');
+                return `items="${escapedItems}"`;
             }
             return '';
         }
 
         function generateCardStackHTML() {
-            const items = JSON.parse(document.getElementById('cardStackItems').value || '[]');
-
-            let html = '<ui-card-stack><div class="stack-container">';
-            items.forEach((item, index) => {
-                html += `<div class="stack-card ${index === 0 ? 'active' : ''}">
-                    <h3>${item.title}</h3>
-                    <p>${item.content}</p>
-                </div>`;
-            });
-            html += '</div></ui-card-stack>';
-            
-            return html;
+            // Return empty string - the component will handle its own HTML generation
+            return '';
         }
 
         function generateSpotlightAttributes() {
             const content = document.getElementById('spotlightContent').value;
             if (content) {
-                return `content="${content}"`;
+                return `content="${content.replace(/"/g, '&quot;')}"`;
             }
             return '';
         }
 
         function generateSpotlightHTML() {
-            const content = document.getElementById('spotlightContent').value;
-
-            let html = '<ui-spotlight>';
-            html += `<div class="spotlight-content">${content}</div>`;
-            html += '<div class="spotlight-highlight"></div>';
-            html += '</ui-spotlight>';
-            
-            return html;
+            // Return empty string - the component will handle its own HTML generation
+            return '';
         }
 
         function generateTickerAttributes() {
             const items = document.getElementById('tickerItems').value;
             if (items) {
-                return `items="${items}"`;
+                return `items="${items.replace(/"/g, '&quot;')}"`;
             }
             return '';
         }
 
         function generateTickerHTML() {
-            const items = document.getElementById('tickerItems').value.split(',').map(item => item.trim());
-
-            let html = '<ui-ticker><div class="ticker-container">';
-            items.forEach(item => {
-                html += `<div class="ticker-item">${item}</div>`;
-            });
-            html += '</div></ui-ticker>';
-            
-            return html;
+            // Return empty string - the component will handle its own HTML generation
+            return '';
         }
 
         function generateNotificationAttributes() {
@@ -1691,24 +1592,15 @@
 
             let attrs = [];
             if (type) attrs.push(`type="${type}"`);
-            if (title) attrs.push(`title="${title}"`);
-            if (message) attrs.push(`message="${message}"`);
+            if (title) attrs.push(`title="${title.replace(/"/g, '&quot;')}"`);
+            if (message) attrs.push(`message="${message.replace(/"/g, '&quot;')}"`);
 
             return attrs.join(' ');
         }
 
         function generateNotificationHTML() {
-            const type = document.getElementById('notificationType').value;
-            const title = document.getElementById('notificationTitle').value;
-            const message = document.getElementById('notificationMessage').value;
-
-            let html = `<ui-notification class="notification-${type}">`;
-            html += `<div class="notification-title">${title}</div>`;
-            html += `<div class="notification-message">${message}</div>`;
-            html += '<button class="notification-close">×</button>';
-            html += '</ui-notification>';
-            
-            return html;
+            // Return empty string - the component will handle its own HTML generation
+            return '';
         }
 
         function generateEnhancedMapAttributes() {
@@ -1725,21 +1617,8 @@
         }
 
         function generateEnhancedMapHTML() {
-            const latitude = document.getElementById('mapLatitude').value;
-            const longitude = document.getElementById('mapLongitude').value;
-            const zoom = document.getElementById('mapZoom').value;
-
-            let html = '<ui-enhanced-map>';
-            html += '<div class="map-container">';
-            html += '<div class="map-placeholder">Map placeholder - Latitude: ' + latitude + ', Longitude: ' + longitude + ', Zoom: ' + zoom + '</div>';
-            html += '</div>';
-            html += '<div class="map-controls">';
-            html += '<button class="map-control">Zoom In</button>';
-            html += '<button class="map-control">Zoom Out</button>';
-            html += '</div>';
-            html += '</ui-enhanced-map>';
-            
-            return html;
+            // Return empty string - the component will handle its own HTML generation
+            return '';
         }
 
         function generateCardSwiperAttributes() {
@@ -1749,7 +1628,10 @@
             const threshold = document.getElementById('swiperThreshold').value;
 
             let attrs = [];
-            if (cards) attrs.push(`cards='${cards}'`);
+            if (cards) {
+                const escapedCards = cards.replace(/"/g, '&quot;');
+                attrs.push(`cards="${escapedCards}"`);
+            }
             if (showActions) attrs.push(`show-actions="true"`);
             if (autoSwipe) attrs.push(`auto-swipe="true"`);
             if (threshold) attrs.push(`swipe-threshold="${threshold}"`);
@@ -1758,55 +1640,8 @@
         }
 
         function generateCardSwiperHTML() {
-            const cards = document.getElementById('swiperCards').value;
-            const showActions = document.getElementById('swiperShowActions').checked;
-            const autoSwipe = document.getElementById('swiperAutoSwipe').checked;
-            const threshold = document.getElementById('swiperThreshold').value;
-
-            let html = '<ui-card-swiper>';
-            html += '<div class="swiper-container">';
-            html += '<div class="swipe-indicator left">NOPE</div>';
-            html += '<div class="swipe-indicator right">LIKE</div>';
-            
-            try {
-                const cardsArray = JSON.parse(cards);
-                cardsArray.forEach((card, index) => {
-                    html += `
-                        <div class="swiper-card" data-index="${index}" style="z-index: ${cardsArray.length - index};">
-                            <img src="${card.image}" alt="${card.title}" class="card-image">
-                            <div class="card-overlay">
-                                <h3 class="card-title">${card.title}</h3>
-                                <p class="card-subtitle">${card.subtitle}</p>
-                                <p class="card-description">${card.description}</p>
-                                <div class="card-rating">
-                                    <span class="rating-stars">⭐ ${card.rating}</span>
-                                    <span class="rating-text">(${card.rating})</span>
-                                </div>
-                                <div class="card-tags">
-                                    ${card.tags.split(',').map(tag => `<span class="card-tag">${tag.trim()}</span>`).join('')}
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
-            } catch (e) {
-                html += '<div class="swiper-card"><div class="card-overlay"><h3>Invalid JSON</h3></div></div>';
-            }
-            
-            html += '</div>';
-            
-            if (showActions) {
-                html += `
-                    <div class="swiper-actions">
-                        <button class="action-btn reject">✕</button>
-                        <button class="action-btn accept">♥</button>
-                    </div>
-                `;
-            }
-            
-            html += '</ui-card-swiper>';
-            
-            return html;
+            // Return empty string - the component will handle its own HTML generation
+            return '';
         }
 
         function generateCalendarAttributes() {
@@ -1817,7 +1652,10 @@
             const firstDay = document.getElementById('calendarFirstDay').value;
 
             let attrs = [];
-            if (events) attrs.push(`events='${events}'`);
+            if (events) {
+                const escapedEvents = events.replace(/"/g, '&quot;');
+                attrs.push(`events="${escapedEvents}"`);
+            }
             if (view) attrs.push(`view="${view}"`);
             if (selectable) attrs.push(`selectable="true"`);
             if (multiSelect) attrs.push(`multi-select="true"`);
@@ -1827,45 +1665,8 @@
         }
 
         function generateCalendarHTML() {
-            const events = document.getElementById('calendarEvents').value;
-            const view = document.getElementById('calendarView').value;
-            const selectable = document.getElementById('calendarSelectable').checked;
-            const multiSelect = document.getElementById('calendarMultiSelect').checked;
-            const firstDay = document.getElementById('calendarFirstDay').value;
-
-            let html = '<ui-calendar>';
-            html += '<div class="calendar-header">';
-            html += '<div class="calendar-nav left"><button class="nav-btn">‹</button></div>';
-            html += '<div class="calendar-nav right"><button class="nav-btn">›</button></div>';
-            html += '<h2 class="calendar-title">January 2024</h2>';
-            html += '</div>';
-            
-            html += '<div class="calendar-controls">';
-            html += '<div class="view-selector">';
-            html += `<button class="view-btn ${view === 'month' ? 'active' : ''}">Month</button>`;
-            html += `<button class="view-btn ${view === 'week' ? 'active' : ''}">Week</button>`;
-            html += `<button class="view-btn ${view === 'day' ? 'active' : ''}">Day</button>`;
-            html += '</div>';
-            html += '<button class="today-btn">Today</button>';
-            html += '</div>';
-            
-            html += '<div class="calendar-body">';
-            html += '<div class="weekdays">';
-            const weekdays = firstDay === 'monday' ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-            weekdays.forEach(day => {
-                html += `<div class="weekday">${day}</div>`;
-            });
-            html += '</div>';
-            
-            html += '<div class="days-grid">';
-            for (let i = 0; i < 42; i++) {
-                html += `<div class="day"><div class="day-number">${i + 1}</div></div>`;
-            }
-            html += '</div>';
-            html += '</div>';
-            html += '</ui-calendar>';
-            
-            return html;
+            // Return empty string - the component will handle its own HTML generation
+            return '';
         }
 
         function generateMediaPlayerAttributes() {
@@ -1883,9 +1684,12 @@
             if (type) attrs.push(`type="${type}"`);
             if (src) attrs.push(`src="${src}"`);
             if (poster) attrs.push(`poster="${poster}"`);
-            if (title) attrs.push(`title="${title}"`);
-            if (description) attrs.push(`description="${description}"`);
-            if (playlist) attrs.push(`playlist='${playlist}'`);
+            if (title) attrs.push(`title="${title.replace(/"/g, '&quot;')}"`);
+            if (description) attrs.push(`description="${description.replace(/"/g, '&quot;')}"`);
+            if (playlist) {
+                const escapedPlaylist = playlist.replace(/"/g, '&quot;');
+                attrs.push(`playlist="${escapedPlaylist}"`);
+            }
             if (showPlaylist) attrs.push(`show-playlist="true"`);
             if (autoplay) attrs.push(`autoplay="true"`);
             if (loop) attrs.push(`loop="true"`);
@@ -1894,62 +1698,8 @@
         }
 
         function generateMediaPlayerHTML() {
-            const type = document.getElementById('mediaType').value;
-            const src = document.getElementById('mediaSrc').value;
-            const poster = document.getElementById('mediaPoster').value;
-            const title = document.getElementById('mediaTitle').value;
-            const description = document.getElementById('mediaDescription').value;
-            const playlist = document.getElementById('mediaPlaylist').value;
-            const showPlaylist = document.getElementById('mediaShowPlaylist').checked;
-            const autoplay = document.getElementById('mediaAutoplay').checked;
-            const loop = document.getElementById('mediaLoop').checked;
-
-            let html = '<ui-media-player>';
-            html += '<div class="player-container">';
-            html += `<${type} class="media-element" ${poster ? `poster="${poster}"` : ''} ${autoplay ? 'autoplay' : ''} ${loop ? 'loop' : ''}>`;
-            html += `<source src="${src}" type="${type === 'video' ? 'video/mp4' : 'audio/mpeg'}">`;
-            html += `Your browser does not support the ${type} element.`;
-            html += `</${type}>`;
-            
-            html += '<div class="player-overlay">';
-            html += '<button class="play-button">▶</button>';
-            html += '</div>';
-            
-            html += '<div class="controls-bar">';
-            html += '<div class="progress-container">';
-            html += '<div class="progress-bar"></div>';
-            html += '</div>';
-            
-            html += '<div class="controls-row">';
-            html += '<div class="controls-left">';
-            html += '<button class="control-btn">▶</button>';
-            html += '<button class="control-btn">⏮</button>';
-            html += '<button class="control-btn">⏭</button>';
-            html += '<span class="time-display">00:00 / 00:00</span>';
-            html += '</div>';
-            
-            html += '<div class="controls-right">';
-            html += '<div class="volume-container">';
-            html += '<button class="control-btn">🔊</button>';
-            html += '<div class="volume-slider">';
-            html += '<div class="volume-level"></div>';
-            html += '</div>';
-            html += '</div>';
-            if (showPlaylist) {
-                html += '<button class="control-btn">📋</button>';
-            }
-            html += '<button class="fullscreen-btn">⛶</button>';
-            html += '</div>';
-            html += '</div>';
-            html += '</div>';
-            
-            html += '<div class="player-info">';
-            html += `<h3 class="media-title">${title}</h3>`;
-            html += `<p class="media-description">${description}</p>`;
-            html += '</div>';
-            html += '</ui-media-player>';
-            
-            return html;
+            // Return empty string - the component will handle its own HTML generation
+            return '';
         }
 
         function generateLyricAttributes() {
@@ -2152,11 +1902,62 @@
 
         // Auto-generate on page load
         document.addEventListener('DOMContentLoaded', function() {
-            // Set default component
-            document.getElementById('componentType').value = 'card';
-            showComponentForm();
-            generateComponent();
+            console.log('🚀 DOM Content Loaded');
+            console.log('📦 Checking for simple-components.js...');
+            
+            // Wait for components to register
+            const waitForComponents = () => {
+                const requiredComponents = [
+                    'ui-card', 'ui-badge', 'ui-avatar', 'ui-chips', 'ui-list', 'ui-divider', 'ui-table',
+                    'ui-accordion', 'ui-carousel', 'ui-quiz', 'ui-keypoints', 'ui-timeline', 'ui-resources',
+                    'ui-code-block', 'ui-suggestions', 'ui-scrollytelling', 'ui-card-stack', 'ui-ticker',
+                    'ui-alert', 'ui-notification', 'ui-tabs', 'ui-map', 'ui-enhanced-map', 'ui-dynamic-map',
+                    'ui-card-swiper', 'ui-calendar', 'ui-media-player', 'ui-lyric', 'ui-spotlight'
+                ];
+                
+                const registeredComponents = requiredComponents.filter(comp => customElements.get(comp));
+                console.log('✅ Registered components:', registeredComponents.length, 'out of', requiredComponents.length);
+                console.log('📋 Available components:', Array.from(customElements.registry.keys()).filter(key => key.startsWith('ui-')));
+                
+                if (registeredComponents.length >= requiredComponents.length) {
+                    // All components registered, proceed
+                    console.log('🎉 All components registered successfully!');
+                    document.getElementById('componentType').value = 'card';
+                    showComponentForm();
+                    generateComponent();
+                    addFormEventListeners();
+                } else {
+                    // Wait a bit more
+                    console.log('⏳ Waiting for components to register...');
+                    setTimeout(waitForComponents, 100);
+                }
+            };
+            
+            waitForComponents();
         });
+        
+        // Function to add event listeners to all form inputs
+        function addFormEventListeners() {
+            // Get all form inputs (input, textarea, select)
+            const formInputs = document.querySelectorAll('input, textarea, select');
+            
+            // Add event listeners to each input
+            formInputs.forEach(input => {
+                // Skip the component type selector as it has its own handler
+                if (input.id === 'componentType') return;
+                
+                // Add listeners for different input types
+                if (input.type === 'checkbox') {
+                    input.addEventListener('change', generateComponent);
+                } else {
+                    input.addEventListener('input', generateComponent);
+                    input.addEventListener('change', generateComponent);
+                }
+            });
+        }
+        
+        // Update showComponentForm to also add listeners to new form inputs
+
     </script>
 </body>
 </html>

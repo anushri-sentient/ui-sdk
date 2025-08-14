@@ -1,0 +1,102 @@
+<!-- Accordion Component -->
+<div class="demo-section">
+    <h2 class="demo-title">3. Accordion Component</h2>
+    <ui-accordion 
+        items='[{"title":"What is this platform?","content":"This is a modern UI component generator that creates beautiful, reusable components using Chota CSS and Open Props."},{"title":"How to use components?","content":"Simply use the custom HTML tags with appropriate attributes to render components with your content."},{"title":"Can I customize styles?","content":"Yes! All components use CSS custom properties that can be easily overridden for your specific design needs."}]'>
+    </ui-accordion>
+</div>
+
+<style>
+ui-accordion {
+    display: block;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: var(--radius-size);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: var(--shadow-soft);
+    overflow: hidden;
+}
+
+ui-accordion .accordion-item {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    transition: all 0.3s var(--animation-smooth);
+}
+
+ui-accordion .accordion-item:last-child {
+    border-bottom: none;
+}
+
+ui-accordion .accordion-header {
+    padding: 1.5rem 2rem;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s var(--animation-smooth);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 600;
+    color: var(--color-dark);
+}
+
+ui-accordion .accordion-header:hover {
+    background: rgba(var(--brand-hue), 80%, 60%, 0.05);
+}
+
+ui-accordion .accordion-header::after {
+    content: '▼';
+    font-size: 0.8rem;
+    transition: transform 0.3s var(--animation-smooth);
+    color: var(--color-primary);
+}
+
+ui-accordion .accordion-header.active::after {
+    transform: rotate(180deg);
+}
+
+ui-accordion .accordion-content {
+    padding: 0 2rem;
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.4s var(--animation-smooth);
+    background: rgba(0, 0, 0, 0.02);
+}
+
+ui-accordion .accordion-content.active {
+    padding: 2rem;
+    max-height: 500px;
+}
+
+ui-accordion .accordion-content p {
+    margin: 0;
+    line-height: 1.7;
+    color: var(--color-dark);
+    opacity: 0.8;
+}
+</style>
+
+<script>
+// Accordion Component Initialization
+function initAccordions() {
+    document.querySelectorAll('ui-accordion').forEach(accordion => {
+        const items = JSON.parse(accordion.getAttribute('items'));
+        
+        let accordionHTML = '';
+        items.forEach((item, index) => {
+            accordionHTML += `
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="this.nextElementSibling.classList.toggle('active')">
+                        ${item.title}
+                    </div>
+                    <div class="accordion-content">
+                        ${item.content}
+                    </div>
+                </div>
+            `;
+        });
+        accordion.innerHTML = accordionHTML;
+    });
+}
+
+// Initialize accordions when DOM is loaded
+document.addEventListener('DOMContentLoaded', initAccordions);
+</script> 

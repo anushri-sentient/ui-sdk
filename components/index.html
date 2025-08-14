@@ -165,7 +165,15 @@
         </div>
 
         <div class="component-grid" id="componentGrid">
-            <div class="loading">Loading components...</div>
+            <div class="loading">
+                <div style="text-align: center; padding: 2rem;">
+                    <div style="font-size: 1.5rem; margin-bottom: 1rem;">🎨 Loading Components...</div>
+                    <div style="background: #e5e7eb; height: 4px; border-radius: 2px; overflow: hidden;">
+                        <div id="loadingProgress" style="background: #3b82f6; height: 100%; width: 0%; transition: width 0.3s;"></div>
+                    </div>
+                    <div id="loadingText" style="margin-top: 1rem; color: #6b7280;">Initializing component library...</div>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -206,7 +214,7 @@
                 name: 'Chips',
                 tag: 'ui-chips',
                 attributes: {
-                    labels: 'React,TypeScript,UI Design,Accessibility',
+                    items: 'React,TypeScript,UI Design,Accessibility',
                     color: 'primary',
                     removable: 'true'
                 }
@@ -411,19 +419,51 @@
                 }
             }
             
-            return `<${component.tag}${attributesString}></${component.tag}>`;
+            // Check if component is registered
+            if (customElements.get(component.tag)) {
+                return `<${component.tag}${attributesString}></${component.tag}>`;
+            } else {
+                // Component not registered - show placeholder with retry button
+                return `
+                    <div style="background: #fef3c7; border: 1px solid #f59e0b; padding: 1rem; border-radius: 0.5rem; text-align: center;">
+                        <strong>⚠️ ${component.name} Component Not Available</strong><br>
+                        <small>The ${component.tag} component is not currently registered.</small>
+                        <br><br>
+                        <button onclick="updateAllComponents()" style="background: #f59e0b; color: white; border: none; padding: 0.5rem 1rem; border-radius: 0.25rem; cursor: pointer;">
+                            Retry Loading
+                        </button>
+                    </div>
+                `;
+            }
         }
 
         function updateAllComponents() {
             const grid = document.getElementById('componentGrid');
             grid.innerHTML = '';
             
+            // Check which components are registered
+            const registeredComponents = Array.from(customElements.registry.keys()).filter(key => key.startsWith('ui-'));
+            console.log('📊 Registered components:', registeredComponents);
+            
+            let loadedCount = 0;
+            let totalCount = components.length;
+            
             components.forEach(component => {
                 const componentItem = document.createElement('div');
                 componentItem.className = 'component-item';
                 
+                const isRegistered = customElements.get(component.tag);
+                if (isRegistered) {
+                    loadedCount++;
+                } else {
+                    console.warn(`❌ Component ${component.tag} not registered`);
+                }
+                
                 componentItem.innerHTML = `
-                    <div class="component-title">${component.name}</div>
+                    <div class="component-title">
+                        ${component.name}
+                        ${isRegistered ? '✅' : '❌'}
+                    </div>
                     <div class="component-demo">
                         ${renderComponent(component)}
                     </div>
@@ -431,14 +471,45 @@
                 
                 grid.appendChild(componentItem);
             });
+            
+            // Add summary at the top
+            const summaryDiv = document.createElement('div');
+            summaryDiv.style.cssText = 'background: #f0f9ff; border: 1px solid #0ea5e9; padding: 1rem; border-radius: 0.5rem; margin-bottom: 2rem; text-align: center;';
+            summaryDiv.innerHTML = `
+                <strong>🎨 Component Library Status</strong><br>
+                <small>${loadedCount} of ${totalCount} components loaded successfully (${((loadedCount/totalCount)*100).toFixed(1)}%)</small>
+            `;
+            grid.insertBefore(summaryDiv, grid.firstChild);
         }
 
         // Initialize components when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            // Wait a bit for custom elements to be defined
-            setTimeout(() => {
-                updateAllComponents();
-            }, 100);
+            // Wait for components to be registered
+            const waitForComponents = () => {
+                const requiredComponents = components.map(comp => comp.tag);
+                const registeredComponents = requiredComponents.filter(comp => customElements.get(comp));
+                const progress = (registeredComponents.length / requiredComponents.length) * 100;
+                
+                // Update loading progress
+                const progressBar = document.getElementById('loadingProgress');
+                const loadingText = document.getElementById('loadingText');
+                if (progressBar && loadingText) {
+                    progressBar.style.width = `${progress}%`;
+                    loadingText.textContent = `Loading components... ${registeredComponents.length}/${requiredComponents.length} ready`;
+                }
+                
+                console.log(`📊 Components ready: ${registeredComponents.length}/${requiredComponents.length} (${progress.toFixed(1)}%)`);
+                
+                if (registeredComponents.length >= requiredComponents.length * 0.8) { // Allow 80% to be ready
+                    console.log('✅ Most components registered, updating display...');
+                    updateAllComponents();
+                } else {
+                    console.log('⏳ Waiting for components to register...');
+                    setTimeout(waitForComponents, 200);
+                }
+            };
+            
+            waitForComponents();
         });
     </script>
 </body>

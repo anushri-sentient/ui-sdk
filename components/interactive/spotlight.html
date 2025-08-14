@@ -1,0 +1,39 @@
+<!-- Spotlight (focus one paragraph at a time) -->
+<div class="demo-section">
+    <h2 class="demo-title">30. Spotlight</h2>
+    <ui-spotlight 
+        sections='[{"title":"Problem","text":"Describe the problem succinctly."},{"title":"Approach","text":"Lay out a step-by-step plan."},{"title":"Answer","text":"Deliver the final result with citations."}]'
+        activeIndex="0">
+    </ui-spotlight>
+
+    <style>
+    ui-spotlight { display:block; }
+    ui-spotlight .sec { padding: var(--size-3); border-radius: var(--radius-size); border:1px solid var(--surface-3); background: var(--surface-1); margin-bottom: var(--size-2); transition: transform .2s var(--animation-smooth), box-shadow .2s var(--animation-smooth); }
+    ui-spotlight .sec.active { transform: translateY(-2px); box-shadow: var(--shadow-medium); border-color: var(--color-primary); }
+    ui-spotlight .title { font-weight:700; }
+    ui-spotlight .text { color: var(--text-1); line-height:1.6; }
+    </style>
+
+    <script>
+    function initSpotlights(){
+        document.querySelectorAll('ui-spotlight').forEach(root => {
+            const sections = safeParseJSON(root.getAttribute('sections')) || [];
+            const activeIndex = parseInt(root.getAttribute('activeIndex')||'0',10);
+            let html = sections.map((s,i)=>`<article class="sec ${i===activeIndex?'active':''}" tabindex="0" data-i="${i}"><div class="title">${escapeHtml(s.title||'')}</div><div class="text">${escapeHtml(s.text||'')}</div></article>`).join('');
+            root.innerHTML = html;
+            const secs = root.querySelectorAll('.sec');
+            function setActive(i){ secs.forEach((el,idx)=> el.classList.toggle('active', idx===i)); }
+            secs.forEach(el=>{
+                el.addEventListener('mouseenter', ()=> setActive(Number(el.getAttribute('data-i'))));
+                el.addEventListener('focus', ()=> setActive(Number(el.getAttribute('data-i'))));
+                el.addEventListener('click', ()=> setActive(Number(el.getAttribute('data-i'))));
+            });
+        });
+    }
+    function safeParseJSON(str){ try { return JSON.parse(str); } catch { return null; } }
+    function escapeHtml(text){ const div=document.createElement('div'); div.textContent=text||''; return div.innerHTML; }
+    document.addEventListener('DOMContentLoaded', initSpotlights);
+    </script>
+</div>
+
+
