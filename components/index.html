@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Component Display</title>
+    <link rel="stylesheet" href="https://unpkg.com/chota@latest">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="component-styles.css">
+    <style>
+        @import "https://unpkg.com/open-props";
+        
+        :root {
+            --brand-hue: 25;
+            --radius-size: 1rem;
+            --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --color-primary: hsl(var(--brand-hue) 95% 60%);
+            --animation-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, hsl(var(--brand-hue) 20% 95%), hsl(calc(var(--brand-hue) + 60) 20% 95%));
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-size);
+            box-shadow: var(--shadow-soft);
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .header h1 {
+            margin: 0;
+            color: var(--color-primary);
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            margin: 0.5rem 0 0 0;
+            color: #6b7280;
+            font-size: 1.1rem;
+        }
+
+        .controls {
+            padding: 1.5rem 2rem;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .design-variant-selector {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .design-variant-selector label {
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .design-variant-selector select {
+            padding: 0.5rem 1rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 0.5rem;
+            background: white;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .component-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            padding: 2rem;
+        }
+
+        .component-item {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+        }
+
+        .component-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .component-title::before {
+            content: '🎨';
+            font-size: 1.2rem;
+        }
+
+        .component-demo {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 0.5rem;
+            border: 1px solid #e2e8f0;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: #6b7280;
+        }
+
+        .error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #dc2626;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 1rem 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Component Display</h1>
+            <p>All 26 UI components rendered with JavaScript</p>
+        </div>
+
+        <div class="controls">
+            <div class="design-variant-selector">
+                <label for="designVariant">Design Variant:</label>
+                <select id="designVariant" onchange="updateAllComponents()">
+                    <option value="minimal">Minimal</option>
+                    <option value="glassmorphism">Glassmorphism</option>
+                    <option value="neumorphism-soft">Neumorphism</option>
+                    <option value="claymorphism-clay">Claymorphism</option>
+                    <option value="brutalism-sharp">Brutalism</option>
+                    <option value="aurora-vibrant">Aurora</option>
+                    <option value="cyberpunk-neon">Cyberpunk</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="component-grid" id="componentGrid">
+            <div class="loading">Loading components...</div>
+        </div>
+    </div>
+
+    <script src="simple-components.js"></script>
+    <script>
+        // Component definitions with demo data
+        const components = [
+            {
+                name: 'Card',
+                tag: 'ui-card',
+                attributes: {
+                    title: 'Welcome to Our Platform',
+                    subtitle: 'Get started today',
+                    content: 'This is a beautiful card component that showcases our design system. It supports various design variants and can be customized extensively.',
+                    image: 'https://picsum.photos/400/200?random=1',
+                    actionText: 'Get Started',
+                    size: 'large'
+                }
+            },
+            {
+                name: 'Badge',
+                tag: 'ui-badge',
+                attributes: {
+                    label: 'New Feature',
+                    color: 'success'
+                }
+            },
+            {
+                name: 'Avatar',
+                tag: 'ui-avatar',
+                attributes: {
+                    src: '😊',
+                    size: 'large',
+                    name: 'John Doe'
+                }
+            },
+            {
+                name: 'Chips',
+                tag: 'ui-chips',
+                attributes: {
+                    labels: 'React,TypeScript,UI Design,Accessibility',
+                    color: 'primary',
+                    removable: 'true'
+                }
+            },
+            {
+                name: 'List',
+                tag: 'ui-list',
+                attributes: {
+                    items: 'Feature 1: Advanced customization options,Feature 2: Responsive design out of the box,Feature 3: Accessibility built-in,Feature 4: Modern design variants',
+                    type: 'unordered'
+                }
+            },
+            {
+                name: 'Divider',
+                tag: 'ui-divider',
+                attributes: {
+                    label: 'Section Break',
+                    style: 'dashed'
+                }
+            },
+            {
+                name: 'Table',
+                tag: 'ui-table',
+                attributes: {
+                    headers: 'Name,Email,Role,Status',
+                    rows: 'John Doe,john@example.com,Developer,Active;Jane Smith,jane@example.com,Designer,Active;Bob Johnson,bob@example.com,Manager,Inactive',
+                    striped: 'true',
+                    hoverable: 'true'
+                }
+            },
+            {
+                name: 'Accordion',
+                tag: 'ui-accordion',
+                attributes: {
+                    items: '[{"title":"What is this library?","content":"A modern UI component library built with web standards and custom elements. It provides 26+ components that can be used with simple HTML tags."},{"title":"How do I get started?","content":"Simply include the CSS and JS files, then use components like <ui-card> or <ui-badge> in your HTML. Check the documentation for all available attributes."},{"title":"Can I customize the design?","content":"Yes! Each component supports design variants like glassmorphism, neumorphism, and more. You can also customize colors, sizes, and other properties."}]',
+                    multiple: 'false'
+                }
+            },
+            {
+                name: 'Carousel',
+                tag: 'ui-carousel',
+                attributes: {
+                    images: 'https://picsum.photos/800/400?random=1,https://picsum.photos/800/400?random=2,https://picsum.photos/800/400?random=3',
+                    interval: '5000'
+                }
+            },
+            {
+                name: 'Quiz',
+                tag: 'ui-quiz',
+                attributes: {
+                    question: 'What is the best way to use this UI library?',
+                    options: '[{"text":"Use HTML tags directly","correct":true},{"text":"Write custom CSS","correct":false},{"text":"Build from scratch","correct":false},{"text":"Use a different library","correct":false}]'
+                }
+            },
+            {
+                name: 'Keypoints',
+                tag: 'ui-keypoints',
+                attributes: {
+                    items: '[{"text":"Easy to use with simple HTML tags"},{"text":"26+ components available"},{"text":"Multiple design variants"},{"text":"Fully responsive and accessible"}]'
+                }
+            },
+            {
+                name: 'Timeline',
+                tag: 'ui-timeline',
+                attributes: {
+                    items: '[{"title":"Project Started","detail":"Initial development of the UI library"},{"title":"Components Added","detail":"Built 26+ components with various features"},{"title":"Design Variants","detail":"Added 7 different design styles"},{"title":"Documentation","detail":"Created comprehensive documentation and demos"}]'
+                }
+            },
+            {
+                name: 'Resources',
+                tag: 'ui-resources',
+                attributes: {
+                    resources: '[{"title":"Component Documentation","description":"Complete reference for all components","url":"#"},{"title":"Design Variants","description":"Learn about different visual styles","url":"#"},{"title":"Visual Builder","description":"Interactive component builder","url":"#"}]'
+                }
+            },
+            {
+                name: 'Code Block',
+                tag: 'ui-code-block',
+                attributes: {
+                    title: 'Example Usage',
+                    content: '<ui-card title="Hello World" designVariant="glassmorphism">\n  This is a beautiful card component!\n</ui-card>',
+                    language: 'html'
+                }
+            },
+            {
+                name: 'Suggestions',
+                tag: 'ui-suggestions',
+                attributes: {
+                    items: 'Try the visual builder,Check out design variants,Read the documentation,Explore all components'
+                }
+            },
+            {
+                name: 'Scrollytelling',
+                tag: 'ui-scrollytelling',
+                attributes: {
+                    steps: '[{"title":"Step 1: Choose Component","content":"Select from 26+ available components"},{"title":"Step 2: Customize","content":"Set attributes like title, content, design variant"},{"title":"Step 3: Deploy","content":"Use in your project with simple HTML tags"}]'
+                }
+            },
+            {
+                name: 'Card Stack',
+                tag: 'ui-card-stack',
+                attributes: {
+                    items: '[{"title":"Card 1","content":"First card in the stack"},{"title":"Card 2","content":"Second card with different content"},{"title":"Card 3","content":"Third card showing variety"}]'
+                }
+            },
+            {
+                name: 'Live Ticker',
+                tag: 'ui-ticker',
+                attributes: {
+                    lines: '["Breaking: New components added to the library!","Update: Design variants now available","News: Documentation has been improved","Alert: Visual builder is now live"]',
+                    speed: '20'
+                }
+            },
+            {
+                name: 'Alert',
+                tag: 'ui-alert',
+                attributes: {
+                    type: 'success',
+                    title: 'Success!',
+                    message: 'All components are now loaded and ready to use.',
+                    dismissible: 'true',
+                    duration: '5000'
+                }
+            },
+            {
+                name: 'Notification',
+                tag: 'ui-notification',
+                attributes: {
+                    type: 'info',
+                    title: 'Information',
+                    message: 'This is an informational notification component.'
+                }
+            },
+            {
+                name: 'Tabs',
+                tag: 'ui-tabs',
+                attributes: {
+                    tabs: '[{"title":"Overview","content":"This is the overview tab content showing basic information about the component library."},{"title":"Features","content":"Key features include 26+ components, multiple design variants, and easy integration."},{"title":"Usage","content":"Simply use HTML tags like <ui-card> or <ui-badge> with appropriate attributes."}]',
+                    activeTab: '0'
+                }
+            },
+            {
+                name: 'Enhanced Map',
+                tag: 'ui-enhanced-map',
+                attributes: {
+                    latitude: '40.7128',
+                    longitude: '-74.0060',
+                    zoom: '1',
+                    markers: '[{"lat":40.7128,"lng":-74.0060,"title":"New York"},{"lat":34.0522,"lng":-118.2437,"title":"Los Angeles"}]'
+                }
+            },
+            {
+                name: 'Dynamic Map',
+                tag: 'ui-dynamic-map',
+                attributes: {
+                    latitude: '40.7128',
+                    longitude: '-74.0060',
+                    zoom: '1',
+                    routes: '[{"from":{"lat":40.7128,"lng":-74.0060},"to":{"lat":34.0522,"lng":-118.2437},"color":"#ff6b6b"}]'
+                }
+            },
+            {
+                name: 'Card Swiper',
+                tag: 'ui-card-swiper',
+                attributes: {
+                    cards: '[{"title":"Swipe Right","content":"This is the first card in the swiper. Swipe right to like!"},{"title":"Swipe Left","content":"This is the second card. Swipe left to pass."},{"title":"Keep Swiping","content":"More cards available. Keep exploring!"}]',
+                    showActions: 'true'
+                }
+            },
+            {
+                name: 'Calendar',
+                tag: 'ui-calendar',
+                attributes: {
+                    events: '[{"date":"2024-01-15","title":"Component Launch","color":"#ff6b6b"},{"date":"2024-01-20","title":"Documentation Update","color":"#4ecdc4"}]',
+                    view: 'month',
+                    theme: 'primary',
+                    selectable: 'true'
+                }
+            },
+            {
+                name: 'Media Player',
+                tag: 'ui-media-player',
+                attributes: {
+                    src: 'https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4',
+                    title: 'Sample Video',
+                    type: 'video',
+                    autoplay: 'false'
+                }
+            }
+        ];
+
+        function renderComponent(component) {
+            const designVariant = document.getElementById('designVariant').value;
+            const attributes = { ...component.attributes, designVariant };
+            
+            let attributesString = '';
+            for (const [key, value] of Object.entries(attributes)) {
+                if (typeof value === 'string' && value.includes('"')) {
+                    attributesString += ` ${key}='${value}'`;
+                } else {
+                    attributesString += ` ${key}="${value}"`;
+                }
+            }
+            
+            return `<${component.tag}${attributesString}></${component.tag}>`;
+        }
+
+        function updateAllComponents() {
+            const grid = document.getElementById('componentGrid');
+            grid.innerHTML = '';
+            
+            components.forEach(component => {
+                const componentItem = document.createElement('div');
+                componentItem.className = 'component-item';
+                
+                componentItem.innerHTML = `
+                    <div class="component-title">${component.name}</div>
+                    <div class="component-demo">
+                        ${renderComponent(component)}
+                    </div>
+                `;
+                
+                grid.appendChild(componentItem);
+            });
+        }
+
+        // Initialize components when page loads
+        document.addEventListener('DOMContentLoaded', function() {
+            // Wait a bit for custom elements to be defined
+            setTimeout(() => {
+                updateAllComponents();
+            }, 100);
+        });
+    </script>
+</body>
+</html>
