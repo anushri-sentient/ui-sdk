@@ -1,0 +1,52 @@
+<!-- Rolling Key Points Component -->
+<div class="demo-section">
+    <h2 class="demo-title">22. Rolling Key Points</h2>
+    <ui-keypoints id="demo-keypoints"
+        items='[{"text":"Retrieval grounding improves factuality"},{"text":"Use citations for verifiability"},{"text":"Prefer streaming markdown for long answers"}]'
+        updatedAt="just now"
+        confidence="0.86"
+        skeletonCount="3">
+    </ui-keypoints>
+
+    <style>
+    ui-keypoints { display:block; }
+    ui-keypoints .kp-header { display:flex; align-items:center; gap: var(--size-2); margin-bottom: var(--size-2); }
+    ui-keypoints .kp-badge { font-size:0.75rem; padding:2px 8px; border-radius:999px; background:var(--surface-3); color:var(--text-2); }
+    ui-keypoints .kp-list { display:flex; flex-direction:column; gap: var(--size-2); }
+    ui-keypoints .kp-item { display:flex; align-items:flex-start; gap: var(--size-2); padding: var(--size-2); border-radius: var(--radius-size); background: var(--surface-1); border:1px solid var(--surface-3); }
+    ui-keypoints .kp-dot { width:8px; height:8px; border-radius:50%; background: var(--color-primary); margin-top: 6px; flex:0 0 auto; }
+    ui-keypoints .kp-text { color: var(--text-1); }
+    ui-keypoints .kp-skeleton { height: 1rem; width: 80%; background: linear-gradient(90deg, var(--surface-2), var(--surface-3), var(--surface-2)); background-size:200% 100%; animation: kp-shimmer 1.2s infinite; border-radius: 6px; }
+    @keyframes kp-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+    </style>
+
+    <script>
+    function initKeypoints(){
+        document.querySelectorAll('ui-keypoints').forEach(root => {
+            const items = safeParseJSON(root.getAttribute('items')) || [];
+            const updatedAt = root.getAttribute('updatedAt') || '';
+            const confidence = root.getAttribute('confidence');
+            const skeletonCount = parseInt(root.getAttribute('skeletonCount')||'0',10);
+
+            let html = '<div class="kp-header">'
+                + (confidence ? `<span class="kp-badge">confidence: ${(Number(confidence)*100).toFixed(0)}%</span>` : '')
+                + (updatedAt ? `<span class="kp-badge">updated ${escapeHtml(updatedAt)}</span>` : '')
+                + '</div>';
+            html += '<div class="kp-list">';
+            items.forEach(kp => {
+                html += `<div class="kp-item"><div class="kp-dot"></div><div class="kp-text">${escapeHtml(kp.text||'')}</div></div>`;
+            });
+            for(let i=0;i<skeletonCount;i++){
+                html += `<div class="kp-item"><div class="kp-dot" style="opacity:.3"></div><div class="kp-skeleton"></div></div>`;
+            }
+            html += '</div>';
+            root.innerHTML = html;
+        });
+    }
+    function safeParseJSON(str){ try { return JSON.parse(str); } catch { return null; } }
+    function escapeHtml(text){ const div=document.createElement('div'); div.textContent=text||''; return div.innerHTML; }
+    document.addEventListener('DOMContentLoaded', initKeypoints);
+    </script>
+</div>
+
+

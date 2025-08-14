@@ -1,0 +1,158 @@
+<!-- Interactive Quiz / Poll Component -->
+<div class="demo-section">
+    <h2 class="demo-title">17. Interactive Quiz / Poll Component</h2>
+    <ui-quiz 
+        question="What is the most important aspect of web development?"
+        options='[{"text":"Design","isCorrect":false},{"text":"Performance","isCorrect":true},{"text":"Content","isCorrect":false},{"text":"SEO","isCorrect":false}]'
+        theme="primary"
+        showResults="true">
+    </ui-quiz>
+</div>
+
+<style>
+ui-quiz {
+    display: block;
+    padding: var(--size-4);
+    border-radius: var(--radius-size);
+    background: var(--surface-1);
+    border: 1px solid var(--surface-3);
+}
+
+ui-quiz .quiz-question {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: var(--size-3);
+    color: var(--text-1);
+}
+
+ui-quiz .quiz-options {
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-2);
+}
+
+ui-quiz .quiz-option {
+    padding: var(--size-3);
+    border: 2px solid var(--surface-3);
+    border-radius: var(--radius-size);
+    cursor: pointer;
+    transition: all 0.2s var(--animation-smooth);
+    background: var(--surface-1);
+}
+
+ui-quiz .quiz-option:hover {
+    border-color: var(--color-primary);
+    background: var(--surface-2);
+}
+
+ui-quiz .quiz-option.selected {
+    border-color: var(--color-primary);
+    background: var(--color-primary);
+    color: white;
+}
+
+ui-quiz .quiz-option.correct {
+    border-color: var(--color-success);
+    background: var(--color-success);
+    color: white;
+}
+
+ui-quiz .quiz-option.incorrect {
+    border-color: var(--color-danger);
+    background: var(--color-danger);
+    color: white;
+}
+
+ui-quiz .quiz-results {
+    margin-top: var(--size-3);
+    padding: var(--size-3);
+    border-radius: var(--radius-size);
+    background: var(--surface-2);
+    display: none;
+}
+
+ui-quiz .quiz-results.show {
+    display: block;
+}
+
+ui-quiz .quiz-feedback {
+    font-weight: 600;
+    margin-bottom: var(--size-2);
+}
+
+ui-quiz .quiz-score {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+</style>
+
+<script>
+// Interactive Quiz Component Initialization
+function initQuizzes() {
+    document.querySelectorAll('ui-quiz').forEach(quiz => {
+        const question = quiz.getAttribute('question');
+        const options = JSON.parse(quiz.getAttribute('options'));
+        const theme = quiz.getAttribute('theme') || 'primary';
+        const showResults = quiz.getAttribute('showResults') === 'true';
+        
+        quiz.classList.add(theme);
+        
+        let quizHTML = `<div class="quiz-question">${question}</div>`;
+        quizHTML += '<div class="quiz-options">';
+        
+        options.forEach((option, index) => {
+            quizHTML += `<div class="quiz-option" data-index="${index}" data-correct="${option.isCorrect}">${option.text}</div>`;
+        });
+        
+        quizHTML += '</div>';
+        
+        if (showResults) {
+            quizHTML += '<div class="quiz-results"><div class="quiz-feedback"></div><div class="quiz-score"></div></div>';
+        }
+        
+        quiz.innerHTML = quizHTML;
+        
+        // Add click handlers
+        const optionElements = quiz.querySelectorAll('.quiz-option');
+        optionElements.forEach(option => {
+            option.addEventListener('click', () => {
+                if (quiz.classList.contains('answered')) return;
+                
+                const isCorrect = option.getAttribute('data-correct') === 'true';
+                option.classList.add('selected');
+                
+                if (isCorrect) {
+                    option.classList.add('correct');
+                } else {
+                    option.classList.add('incorrect');
+                    // Show correct answer
+                    optionElements.forEach(opt => {
+                        if (opt.getAttribute('data-correct') === 'true') {
+                            opt.classList.add('correct');
+                        }
+                    });
+                }
+                
+                quiz.classList.add('answered');
+                
+                if (showResults) {
+                    const results = quiz.querySelector('.quiz-results');
+                    const feedback = quiz.querySelector('.quiz-feedback');
+                    const score = quiz.querySelector('.quiz-score');
+                    
+                    feedback.textContent = isCorrect ? 'Correct!' : 'Incorrect!';
+                    feedback.style.color = isCorrect ? 'var(--color-success)' : 'var(--color-danger)';
+                    
+                    const correctCount = options.filter(opt => opt.isCorrect).length;
+                    score.textContent = `You selected: ${option.text}`;
+                    
+                    results.classList.add('show');
+                }
+            });
+        });
+    });
+}
+
+// Initialize quizzes when DOM is loaded
+document.addEventListener('DOMContentLoaded', initQuizzes);
+</script>

@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Component Library</title>
+    <link rel="stylesheet" href="https://unpkg.com/chota@latest">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="components/component-styles.css">
+    <style>
+        @import "https://unpkg.com/open-props";
+        
+        :root {
+            --brand-hue: 25;
+            --radius-size: 1rem;
+            --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --color-primary: hsl(var(--brand-hue) 95% 60%);
+            --animation-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, hsl(var(--brand-hue) 20% 95%), hsl(calc(var(--brand-hue) + 60) 20% 95%));
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-size);
+            box-shadow: var(--shadow-soft);
+            overflow: hidden;
+        }
+
+        .header {
+            padding: 2rem;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .header h1 {
+            margin: 0;
+            color: var(--color-primary);
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .header p {
+            margin: 0.5rem 0 0 0;
+            color: #6b7280;
+            font-size: 1.1rem;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 1.5rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s var(--animation-smooth);
+            border: none;
+            background: transparent;
+            font-size: 1rem;
+            font-weight: 500;
+            color: #6b7280;
+        }
+
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.8);
+            color: var(--color-primary);
+        }
+
+        .tab.active {
+            background: white;
+            color: var(--color-primary);
+            border-bottom: 3px solid var(--color-primary);
+        }
+
+        .tab-content {
+            display: none;
+            min-height: 70vh;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .content-area {
+            padding: 2rem;
+        }
+
+        .iframe-container {
+            width: 100%;
+            height: 70vh;
+            border: none;
+            border-radius: 0.5rem;
+        }
+
+        .documentation-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: linear-gradient(135deg, var(--color-primary), hsl(calc(var(--brand-hue) + 30) 80% 60%));
+            color: white;
+            border-radius: 1rem;
+        }
+
+        .documentation-header h2 {
+            margin: 0 0 1rem 0;
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        .documentation-header p {
+            margin: 0;
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .component-categories {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .category-btn {
+            padding: 0.75rem 1.5rem;
+            border: 2px solid var(--color-primary);
+            background: white;
+            color: var(--color-primary);
+            border-radius: 2rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s var(--animation-smooth);
+        }
+
+        .category-btn:hover,
+        .category-btn.active {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .documentation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .component-doc {
+            background: white;
+            border-radius: 1rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+            transition: all 0.3s var(--animation-smooth);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .component-doc::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--color-primary), hsl(calc(var(--brand-hue) + 30) 80% 60%));
+        }
+
+        .component-doc:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .component-doc h3 {
+            margin: 0 0 1.5rem 0;
+            color: var(--color-primary);
+            font-size: 1.4rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .component-doc h3::before {
+            content: '🎨';
+            font-size: 1.2rem;
+        }
+
+        .component-doc .description {
+            color: #6b7280;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .component-doc .attributes {
+            background: #f8fafc;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid var(--color-primary);
+        }
+
+        .component-doc .attributes h4 {
+            margin: 0 0 1rem 0;
+            color: #374151;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .component-doc .attributes ul {
+            margin: 0;
+            padding-left: 1.5rem;
+            color: #6b7280;
+        }
+
+        .component-doc .attributes li {
+            margin-bottom: 0.5rem;
+            line-height: 1.5;
+        }
+
+        .component-doc .attributes strong {
+            color: #374151;
+            font-weight: 600;
+        }
+
+        .component-doc .example {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            overflow-x: auto;
+            position: relative;
+        }
+
+        .component-doc .example::before {
+            content: '💻 Example';
+            position: absolute;
+            top: 0.5rem;
+            right: 1rem;
+            font-size: 0.75rem;
+            color: #9ca3af;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .component-doc .usage-note {
+            margin-top: 1rem;
+            padding: 1rem;
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 0.5rem;
+            color: #92400e;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .component-doc .usage-note::before {
+            content: '💡 ';
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .documentation-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .component-categories {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .category-btn {
+                width: 100%;
+                max-width: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>UI Component Library</h1>
+            <p>Build beautiful interfaces with our comprehensive component suite</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('builder')">Visual Builder</button>
+            <button class="tab" onclick="switchTab('docs')">Documentation</button>
+            <button class="tab" onclick="switchTab('display')">Component Display</button>
+        </div>
+
+        <div id="builder" class="tab-content active">
+            <div class="content-area">
+                <iframe src="component-builder.html" class="iframe-container"></iframe>
+            </div>
+        </div>
+
+        <div id="docs" class="tab-content">
+            <div class="content-area">
+                <div class="documentation-header">
+                    <h2>📚 Component Documentation</h2>
+                    <p>Complete reference for all 26 UI components with attributes, examples, and usage notes</p>
+                </div>
+
+                <div class="component-categories">
+                    <button class="category-btn active" onclick="filterComponents('all')">All Components</button>
+                    <button class="category-btn" onclick="filterComponents('basic')">Basic</button>
+                    <button class="category-btn" onclick="filterComponents('interactive')">Interactive</button>
+                    <button class="category-btn" onclick="filterComponents('feedback')">Feedback</button>
+                    <button class="category-btn" onclick="filterComponents('media')">Media</button>
+                    <button class="category-btn" onclick="filterComponents('layout')">Layout</button>
+                </div>
+                
+                <div class="documentation-grid">
+                    <div class="component-doc" data-category="basic">
+                        <h3>Card</h3>
+                        <div class="description">
+                            Versatile content containers with images, titles, descriptions, and action buttons. Perfect for product displays, articles, and feature highlights.
+                        </div>
+                        <div class="attributes">
+                            <h4>📋 Available Attributes</h4>
+                            <ul>
+                                <li><strong>title</strong> - Main heading text</li>
+                                <li><strong>subtitle</strong> - Secondary heading text</li>
+                                <li><strong>content</strong> - Main content description</li>
+                                <li><strong>image</strong> - Image URL for the card</li>
+                                <li><strong>actionText</strong> - Button text</li>
+                                <li><strong>designVariant</strong> - Style variant (glassmorphism, neumorphism, etc.)</li>
+                                <li><strong>size</strong> - Card size (small, medium, large)</li>
+                            </ul>
+                        </div>
+                        <div class="example">
+&lt;ui-card 
+    title="Product Name" 
+    subtitle="Product Category"
+    content="This is a beautiful product description that showcases the item."
+    image="https://example.com/image.jpg"
+    actionText="Learn More"
+    designVariant="glassmorphism"
+    size="large"&gt;
+&lt;/ui-card&gt;
+                        </div>
+                        <div class="usage-note">
+                            Use designVariant to apply different visual styles. Available variants: glassmorphism, neumorphism-soft, claymorphism-clay, brutalism-sharp, aurora-vibrant, minimal-ultra, cyberpunk-neon
+                        </div>
+                    </div>
+
+                    <div class="component-doc" data-category="basic">
+                        <h3>Badge</h3>
+                        <div class="description">
+                            Small status indicators and labels for highlighting important information, notifications, or categories.
+                        </div>
+                        <div class="attributes">
+                            <h4>📋 Available Attributes</h4>
+                            <ul>
+                                <li><strong>label</strong> - Text content of the badge</li>
+                                <li><strong>color</strong> - Color theme (primary, success, warning, danger, info)</li>
+                                <li><strong>designVariant</strong> - Style variant for different visual effects</li>
+                            </ul>
+                        </div>
+                        <div class="example">
+&lt;ui-badge 
+    label="New Feature" 
+    color="success"
+    designVariant="neumorphism-soft"&gt;
+&lt;/ui-badge&gt;
+                        </div>
+                        <div class="usage-note">
+                            Perfect for status indicators, notifications, and category labels. Use color to convey meaning (success=green, warning=yellow, danger=red).
+                        </div>
+                    </div>
+
+                    <div class="component-doc" data-category="basic">
+                        <h3>Avatar</h3>
+                        <div class="description">
+                            User profile images and icons with different sizes and fallback options. Supports images, initials, and emoji.
+                        </div>
+                        <div class="attributes">
+                            <h4>📋 Available Attributes</h4>
+                            <ul>
+                                <li><strong>src</strong> - Image URL or emoji</li>
+                                <li><strong>alt</strong> - Alt text for accessibility</li>
+                                <li><strong>size</strong> - Size variant (small, medium, large)</li>
+                                <li><strong>name</strong> - User name for initials fallback</li>
+                            </ul>
+                        </div>
+                        <div class="example">
+&lt;ui-avatar 
+    src="https://example.com/user.jpg" 
+    alt="User Profile"
+    size="large"
+    name="John Doe"&gt;
+&lt;/ui-avatar&gt;
+                        </div>
+                        <div class="usage-note">
+                            If no image is provided, the component will show initials from the name attribute. Supports emoji as src for quick icons.
+                        </div>
+                    </div>
+
+                    <div class="component-doc" data-category="basic">
+                        <h3>Chips</h3>
+                        <div class="description">
+                            Interactive tag components for filtering, categorization, and selection. Perfect for search filters and content tags.
+                        </div>
+                        <div class="attributes">
+                            <h4>📋 Available Attributes</h4>
+                            <ul>
+                                <li><strong>items</strong> - Comma-separated list of chip labels</li>
+                                <li><strong>color</strong> - Color theme (primary, success, warning, danger)</li>
+                                <li><strong>removable</strong> - Whether chips can be removed (true/false)</li>
+                            </ul>
+                        </div>
+                        <div class="example">
+&lt;ui-chips 
+    items="React,TypeScript,UI Design,Accessibility"
+    color="primary"
+    removable="true"&gt;
+&lt;/ui-chips&gt;
+                        </div>
+                        <div class="usage-note">
+                            Great for filtering interfaces, tag systems, and multi-select components. Removable chips emit events when clicked.
+                        </div>
+                    </div>
+
+                    <div class="component-doc" data-category="basic">
+                        <h3>List</h3>
+                        <div class="description">
+                            Ordered and unordered lists with customizable styling. Perfect for navigation menus, feature lists, and content organization.
+                        </div>
+                        <div class="attributes">
+                            <h4>📋 Available Attributes</h4>
+                            <ul>
+                                <li><strong>items</strong> - Comma-separated list items</li>
+                                <li><strong>type</strong> - List type (ordered, unordered)</li>
+                            </ul>
+                        </div>
+                        <div class="example">
+&lt;ui-list 
+    items="Feature 1,Feature 2,Feature 3,Feature 4"
+    type="unordered"&gt;
+&lt;/ui-list&gt;
+                        </div>
+                        <div class="usage-note">
+                            Use ordered lists for step-by-step instructions or numbered items. Unordered lists work well for feature lists and navigation.
+                        </div>
+                    </div>
+
+                    <div class="component-doc">
+                        <h3>Divider</h3>
+                        <div class="attributes">
+                            <strong>Attributes:</strong> label, style
+                        </div>
+                        <div class="example">
+                            &lt;ui-divider label="Section" style="dashed"&gt;&lt;/ui-divider&gt;
+                        </div>
+                    </div>
+
+                    <div class="component-doc" data-category="basic">
+                        <h3>Table</h3>
+                        <div class="description">
+                            Data tables with sorting, filtering, and responsive design. Perfect for displaying structured data, user lists, and reports.
+                        </div>
+                        <div class="attributes">
+                            <h4>📋 Available Attributes</h4>
+                            <ul>
+                                <li><strong>headers</strong> - Comma-separated column headers</li>
+                                <li><strong>rows</strong> - Semicolon-separated rows with comma-separated cells</li>
+                                <li><strong>striped</strong> - Alternating row colors (true/false)</li>
+                                <li><strong>hoverable</strong> - Row hover effects (true/false)</li>
+                            </ul>
+                        </div>
+                        <div class="example">
+&lt;ui-table 
+    headers="Name,Email,Role,Status"
+    rows="John Doe,john@example.com,Developer,Active;Jane Smith,jane@example.com,Designer,Active;Bob Johnson,bob@example.com,Manager,Inactive"
+    striped="true"
+    hoverable="true"&gt;
+&lt;/ui-table&gt;
+                        </div>
+                        <div class="usage-note">
+                            Use semicolons to separate rows and commas to separate cells within rows. Enable striped and hoverable for better readability.
+                        </div>
+                    </div>
+
+                    <div class="component-doc" data-category="interactive">
+                        <h3>Accordion</h3>
+                        <div class="description">
+                            Collapsible content sections for organizing information. Perfect for FAQs, settings panels, and content that needs to be expandable.
+                        </div>
+                        <div class="attributes">
+                            <h4>📋 Available Attributes</h4>
+                            <ul>
+                                <li><strong>items</strong> - JSON array of accordion sections</li>
+                                <li><strong>multiple</strong> - Allow multiple sections open (true/false)</li>
+                            </ul>
+                        </div>
+                        <div class="example">
+&lt;ui-accordion 
+    items='[
+        {"title":"What is this library?","content":"A modern UI component library built with web standards."},
+        {"title":"How do I get started?","content":"Check the documentation and try the visual builder."}
+    ]'
+    multiple="false"&gt;
+&lt;/ui-accordion&gt;
+                        </div>
+                        <div class="usage-note">
+                            Use for FAQs, settings, and any content that benefits from progressive disclosure. Set multiple="true" to allow multiple sections open.
+                        </div>
+                    </div>
+
+                    <div class="component-doc" data-category="interactive">
+                        <h3>Carousel</h3>
+                        <div class="description">
+                            Image carousel with auto-play functionality and navigation controls. Perfect for showcasing products, portfolios, or image galleries.
+                        </div>
+                        <div class="attributes">
+                            <h4>📋 Available Attributes</h4>
+                            <ul>
+                                <li><strong>images</strong> - Comma-separated image URLs</li>
+                                <li><strong>interval</strong> - Auto-play interval in milliseconds</li>
+                            </ul>
+                        </div>
+                        <div class="example">
+&lt;ui-carousel 
+    images="https://picsum.photos/800/400?random=1,https://picsum.photos/800/400?random=2,https://picsum.photos/800/400?random=3"
+    interval="5000"&gt;
+&lt;/ui-carousel&gt;
+                        </div>
+                        <div class="usage-note">
+                            Set interval to 0 to disable auto-play. Images should be the same dimensions for best results. Supports touch/swipe gestures.
+                        </div>
+                    </div>
+
+                    <div class="component-doc">
+                        <h3>Quiz</h3>
+                        <div class="attributes">
+                            <strong>Attributes:</strong> question, options
+                        </div>
+                        <div class="example">
+                            &lt;ui-quiz question="What is 2+2?" options='[{"text":"4","correct":true}]'&gt;&lt;/ui-quiz&gt;
+                        </div>
+                    </div>
+
+                    <div class="component-doc">
+                        <h3>Keypoints</h3>
+                        <div class="attributes">
+                            <strong>Attributes:</strong> items
+                        </div>
+                        <div class="example">
+                            &lt;ui-keypoints items='[{"text":"Key point 1"},{"text":"Key point 2"}]'&gt;&lt;/ui-keypoints&gt;
+                        </div>
+                    </div>
+
+                    <div class="component-doc">
+                        <h3>Timeline</h3>
+                        <div class="attributes">
+                            <strong>Attributes:</strong> items
+                        </div>
+                        <div class="example">
+                            &lt;ui-timeline items='[{"title":"Event 1","detail":"Description"}]'&gt;&lt;/ui-timeline&gt;
+                        </div>
+                    </div>
+
+                    <div class="component-doc">
+                        <h3>Resources</h3>
+                        <div class="attributes">
+                            <strong>Attributes:</strong> items
+                        </div>
+                        <div class="example">
+                            &lt;ui-resources items='[{"title":"Resource","description":"Description","url":"#"}]'&gt;&lt;/ui-resources&gt;
+                        </div>
+                    </div>
+
+                    <div class="component-doc">
+                        <h3>Code Block</h3>
+                        <div class="attributes">
+                            <strong>Attributes:</strong> title, content, language
+                        </div>
+                        <div class="example">
+                            &lt;ui-code-block title="Example" content="console.log('Hello')" language="javascript"&gt;&lt;/ui-code-block&gt;
+                        </div>
+                    </div>
+
+                    <div class="component-doc">
+                        <h3>Suggestions</h3>
+                        <div class="attributes">
+                            <strong>Attributes:</strong> items
+                        </div>
+                        <div class="example">
+                            &lt;ui-suggestions items="Suggestion 1,Suggestion 2"&gt;&lt;/ui-suggestions&gt;
+                        </div>
+                    </div>
+
+                    <div class="component-doc">
+                        <h3>Scrollytelling</h3>
+                        <div class="attributes">
+                            <strong>Attributes:</strong> steps
+                        </div>
+                        <div class="example">
+                            &lt;ui-scrollytelling steps='[{"title":"Step 1","content":"Content"}]'&gt;&lt;/ui-scrollytelling&gt;
+                        </div>
+                    </div>
+
+                    <div class="component-doc">
+                        <h3>Card Stack</h3>
+                        <div class="attributes">
+                            <strong>Attributes:</strong> items
+                        </div>
+                        <div class="example">
+                            &lt;ui-card-stack items='[{"title":"Card 1","content":"Content"}]'&gt;&lt;/ui-card-stack&gt;
+                        </div>
+                    </div>
+
+                    <div class="component-doc">
+                        <h3>Live Ticker</h3>
+                        <div class="attributes">
+                            <strong>Attributes:</strong> items
+                        </div>
+                        <div class="example">
+                            &lt;ui-ticker items="News 1,News 2,News 3"&gt;&lt;/ui-ticker&gt;
+                        </div>
+                    </div>
+
+                    <div class="component-doc" data-category="feedback">
+                        <h3>Alert</h3>
+                        <div class="description">
+                            Notification messages for user feedback, warnings, and important information. Auto-dismissible with different severity levels.
+                        </div>
+                        <div class="attributes">
+                            <h4>📋 Available Attributes</h4>
+                            <ul>
+                                <li><strong>type</strong> - Alert type (success, info, warning, danger)</li>
+                                <li><strong>title</strong> - Alert title/heading</li>
+                                <li><strong>message</strong> - Alert message content</li>
+                                <li><strong>dismissible</strong> - Auto-dismiss after duration (true/false)</li>
+                                <li><strong>duration</strong> - Auto-dismiss duration in milliseconds</li>
+                            </ul>
+                        </div>
+                        <div class="example">
+&lt;ui-alert 
+    type="success"
+    title="Success!"
+    message="Your changes have been saved successfully."
+    dismissible="true"
+    duration="5000"&gt;
+&lt;/ui-alert&gt;
+                        </div>
+                        <div class="usage-note">
+                            Use different types to convey meaning: success (green), info (blue), warning (yellow), danger (red). Set duration for auto-dismiss.
+                        </div>
+                    </div>
+
+                    <div class="component-doc">
+                        <h3>Notification</h3>
+                        <div class="attributes">
+                            <strong>Attributes:</strong> type, title, message
+                        </div>
+                        <div class="example">
+                            &lt;ui-notification type="info" title="Info" message="Information message"&gt;&lt;/ui-notification&gt;
+                        </div>
+                    </div>
+
+                    <div class="component-doc">
+                        <h3>Tabs</h3>
+                        <div class="attributes">
+                            <strong>Attributes:</strong> tabs, activeTab
+                        </div>
+                        <div class="example">
+                            &lt;ui-tabs tabs='[{"title":"Tab 1","content":"Content"}]' activeTab="0"&gt;&lt;/ui-tabs&gt;
+                        </div>
+                    </div>
+
+                    <div class="component-doc">
+                        <h3>Map</h3>
+                        <div class="attributes">
+                            <strong>Attributes:</strong> latitude, longitude, zoom
+                        </div>
+                        <div class="example">
+                            &lt;ui-map latitude="40.7128" longitude="-74.0060" zoom="2"&gt;&lt;/ui-map&gt;
+                        </div>
+                    </div>
+
+                    <div class="component-doc">
+                        <h3>Card Swiper</h3>
+                        <div class="attributes">
+                            <strong>Attributes:</strong> cards, showActions
+                        </div>
+                        <div class="example">
+                            &lt;ui-card-swiper cards='[{"title":"Card 1","content":"Content"}]'&gt;&lt;/ui-card-swiper&gt;
+                        </div>
+                    </div>
+
+                    <div class="component-doc">
+                        <h3>Calendar</h3>
+                        <div class="attributes">
+                            <strong>Attributes:</strong> events, view, theme, selectable
+                        </div>
+                        <div class="example">
+                            &lt;ui-calendar events='[]' view="month" theme="primary"&gt;&lt;/ui-calendar&gt;
+                        </div>
+                    </div>
+
+                    <div class="component-doc">
+                        <h3>Media Player</h3>
+                        <div class="attributes">
+                            <strong>Attributes:</strong> src, title, type, autoplay
+                        </div>
+                        <div class="example">
+                            &lt;ui-media-player src="video.mp4" title="Video" type="video"&gt;&lt;/ui-media-player&gt;
+                        </div>
+                    </div>
+
+                    <div class="component-doc">
+                        <h3>Lyric</h3>
+                        <div class="attributes">
+                            <strong>Attributes:</strong> text, mode, cursor, speed
+                        </div>
+                        <div class="example">
+                            &lt;ui-lyric text="Hello World" mode="word" cursor="true"&gt;&lt;/ui-lyric&gt;
+                        </div>
+                    </div>
+
+                    <div class="component-doc">
+                        <h3>Spotlight</h3>
+                        <div class="attributes">
+                            <strong>Attributes:</strong> sections, activeIndex
+                        </div>
+                        <div class="example">
+                            &lt;ui-spotlight sections='[{"title":"Section 1","text":"Content"}]'&gt;&lt;/ui-spotlight&gt;
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="display" class="tab-content">
+            <div class="content-area">
+                <iframe src="components/index.html" class="iframe-container"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function switchTab(tabName) {
+            // Hide all tab contents
+            const tabContents = document.querySelectorAll('.tab-content');
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // Remove active class from all tabs
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            
+            // Show selected tab content
+            document.getElementById(tabName).classList.add('active');
+            
+            // Add active class to clicked tab
+            event.target.classList.add('active');
+        }
+
+        function filterComponents(category) {
+            const components = document.querySelectorAll('.component-doc');
+            const buttons = document.querySelectorAll('.category-btn');
+            
+            // Update active button
+            buttons.forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Show/hide components based on category
+            components.forEach(component => {
+                if (category === 'all' || component.dataset.category === category) {
+                    component.style.display = 'block';
+                } else {
+                    component.style.display = 'none';
+                }
+            });
+        }
+
+        // Add smooth scrolling to documentation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add copy functionality to code examples
+            document.querySelectorAll('.example').forEach(example => {
+                example.addEventListener('click', function() {
+                    const text = this.textContent.trim();
+                    navigator.clipboard.writeText(text).then(() => {
+                        // Show a brief "copied" message
+                        const originalContent = this.innerHTML;
+                        this.innerHTML = '<span style="color: #10b981;">✓ Copied to clipboard!</span>';
+                        setTimeout(() => {
+                            this.innerHTML = originalContent;
+                        }, 2000);
+                    });
+                });
+            });
+        });
+    </script>
+</body>
+</html>

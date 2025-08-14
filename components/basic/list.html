@@ -1,0 +1,50 @@
+<!-- List Component -->
+<div class="demo-section">
+    <h2 class="demo-title">7. List Component</h2>
+    <ui-list 
+        items="First item with some content,Second item with more details,Third item for demonstration"
+        ordered="false">
+    </ui-list>
+    <br>
+    <ui-list 
+        items="Step one: Initialize project,Step two: Install dependencies,Step three: Start development"
+        ordered="true">
+    </ui-list>
+</div>
+
+<style>
+ui-list {
+    display: block;
+}
+
+ui-list ol,
+ui-list ul {
+    padding-left: var(--size-4);
+}
+
+ui-list li {
+    margin-bottom: var(--size-2);
+    line-height: 1.6;
+}
+</style>
+
+<script>
+// List Component Initialization
+function initLists() {
+    document.querySelectorAll('ui-list').forEach(list => {
+        const items = list.getAttribute('items').split(',');
+        const ordered = list.getAttribute('ordered') === 'true';
+        
+        const tag = ordered ? 'ol' : 'ul';
+        let listHTML = `<${tag}>`;
+        items.forEach(item => {
+            listHTML += `<li>${item.trim()}</li>`;
+        });
+        listHTML += `</${tag}>`;
+        list.innerHTML = listHTML;
+    });
+}
+
+// Initialize lists when DOM is loaded
+document.addEventListener('DOMContentLoaded', initLists);
+</script> 

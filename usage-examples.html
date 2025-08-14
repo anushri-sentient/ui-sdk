@@ -1,0 +1,820 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Components - Usage Examples</title>
+    <link rel="stylesheet" href="https://unpkg.com/chota@latest">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="components/simple-components.js"></script>
+    <style>
+        @import "https://unpkg.com/open-props";
+        
+        :root {
+            --brand-hue: 25;
+            --radius-size: 1rem;
+            --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --color-primary: hsl(var(--brand-hue) 95% 60%);
+            --animation-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, hsl(var(--brand-hue) 20% 95%), hsl(calc(var(--brand-hue) + 60) 20% 95%));
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-size);
+            box-shadow: var(--shadow-soft);
+        }
+
+        header h1 {
+            background: linear-gradient(135deg, var(--color-primary), hsl(calc(var(--brand-hue) + 30) 80% 60%));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .example-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-size);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .example-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--color-primary);
+        }
+
+        .example-description {
+            color: #666;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+        }
+
+        .code-block {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+
+        .demo-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .method-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .method-tab {
+            padding: 0.5rem 1rem;
+            background: #f3f4f6;
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.3s var(--animation-smooth);
+        }
+
+        .method-tab.active {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .method-content {
+            display: none;
+        }
+
+        .method-content.active {
+            display: block;
+        }
+
+        .quick-actions {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 0.5rem 1rem;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.3s var(--animation-smooth);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .component-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        /* Component Styles */
+        .card {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            box-shadow: var(--shadow-soft);
+            transition: all 0.3s var(--animation-smooth);
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .alert-success { background: #d1fae5; color: #065f46; }
+        .alert-error { background: #fee2e2; color: #991b1b; }
+        .alert-warning { background: #fef3c7; color: #92400e; }
+        .alert-info { background: #dbeafe; color: #1e40af; }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin: 0.25rem;
+        }
+
+        .badge-primary { background: var(--color-primary); color: white; }
+        .badge-success { background: #10b981; color: white; }
+        .badge-warning { background: #f59e0b; color: white; }
+        .badge-danger { background: #ef4444; color: white; }
+
+        .avatar {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            margin: 0.25rem;
+        }
+
+        .chips {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .chip {
+            padding: 0.25rem 0.75rem;
+            background: #f3f4f6;
+            border-radius: 1rem;
+            font-size: 0.875rem;
+            color: #374151;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        .table th,
+        .table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .table th {
+            background: #f9fafb;
+            font-weight: 600;
+        }
+
+        .table-striped tbody tr:nth-child(even) {
+            background: #f9fafb;
+        }
+
+        .accordion {
+            border: 1px solid #e5e7eb;
+            border-radius: 0.5rem;
+            overflow: hidden;
+        }
+
+        .accordion-header {
+            padding: 1rem;
+            background: #f9fafb;
+            cursor: pointer;
+            border-bottom: 1px solid #e5e7eb;
+            font-weight: 500;
+        }
+
+        .accordion-content {
+            padding: 1rem;
+            background: white;
+            display: none;
+        }
+
+        .accordion-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎨 UI Components Usage Examples</h1>
+            <p>Learn how to use components in different ways - from simple HTML to advanced JavaScript APIs</p>
+        </header>
+
+        <!-- Card Examples -->
+        <div class="example-section">
+            <h2 class="example-title">Card Component</h2>
+            <p class="example-description">Create beautiful cards with images, content, and actions. Perfect for product displays, blog posts, and content showcases.</p>
+            
+            <div class="method-tabs">
+                <button class="method-tab active" onclick="showMethod('card', 'html')">HTML Tags</button>
+                <button class="method-tab" onclick="showMethod('card', 'js')">JavaScript API</button>
+                <button class="method-tab" onclick="showMethod('card', 'builder')">Visual Builder</button>
+            </div>
+
+            <div id="card-html" class="method-content active">
+                <div class="code-block">
+&lt;ui-card 
+    title="Product Name"
+    subtitle="Product Category"
+    image="https://picsum.photos/400/250"
+    content="This is a beautiful product description that showcases the features and benefits."
+    actionText="Buy Now"
+    actionLink="#"
+    badge="New"
+    variant="elevated"
+    size="medium"
+&gt;&lt;/ui-card&gt;
+                </div>
+                <div class="demo-area" id="card-demo-html">
+                    <ui-card 
+                        title="Product Name"
+                        subtitle="Product Category"
+                        image="https://picsum.photos/400/250"
+                        content="This is a beautiful product description that showcases the features and benefits."
+                        actionText="Buy Now"
+                        actionLink="#"
+                        badge="New"
+                        variant="elevated"
+                        size="medium">
+                    </ui-card>
+                </div>
+            </div>
+
+            <div id="card-js" class="method-content">
+                <div class="code-block">
+// Simple card with defaults
+const card = UI.card({
+    title: "Product Name",
+    content: "Product description here"
+});
+
+// Advanced card with all options
+const advancedCard = UI.card({
+    title: "Premium Product",
+    subtitle: "Luxury Category",
+    image: "https://picsum.photos/400/250",
+    content: "Detailed product description with features and benefits.",
+    actionText: "Add to Cart",
+    actionLink: "/cart",
+    badge: "Featured",
+    variant: "elevated",
+    size: "large",
+    rating: "4.8",
+    features: ["Free Shipping", "30-Day Return", "24/7 Support"]
+});
+
+// Insert into page
+UI.insert('#card-demo-js', card);
+                </div>
+                <div class="demo-area" id="card-demo-js">
+                    <button class="action-btn" onclick="demoCard()">Generate Card</button>
+                </div>
+            </div>
+
+            <div id="card-builder" class="method-content">
+                <p>Use the <a href="component-builder.html" target="_blank">Visual Component Builder</a> to create cards with a user-friendly interface.</p>
+            </div>
+        </div>
+
+        <!-- Table Examples -->
+        <div class="example-section">
+            <h2 class="example-title">Table Component</h2>
+            <p class="example-description">Display data in organized tables with sorting, filtering, and responsive design.</p>
+            
+            <div class="method-tabs">
+                <button class="method-tab active" onclick="showMethod('table', 'html')">HTML Tags</button>
+                <button class="method-tab" onclick="showMethod('table', 'js')">JavaScript API</button>
+                <button class="method-tab" onclick="showMethod('table', 'data')">Data Arrays</button>
+            </div>
+
+            <div id="table-html" class="method-content active">
+                <div class="code-block">
+&lt;ui-table 
+    headers="Name,Email,Role,Status"
+    rows="John Doe,john@example.com,Developer,Active;Jane Smith,jane@example.com,Designer,Active"
+    striped="true"
+    hoverable="true"
+&gt;&lt;/ui-table&gt;
+                </div>
+                <div class="demo-area" id="table-demo-html">
+                    <ui-table 
+                        headers="Name,Email,Role,Status"
+                        rows="John Doe,john@example.com,Developer,Active;Jane Smith,jane@example.com,Designer,Active"
+                        striped="true"
+                        hoverable="true">
+                    </ui-table>
+                </div>
+            </div>
+
+            <div id="table-js" class="method-content">
+                <div class="code-block">
+// Create table from data array
+const userData = [
+    { name: "John Doe", email: "john@example.com", role: "Developer", status: "Active" },
+    { name: "Jane Smith", email: "jane@example.com", role: "Designer", status: "Active" },
+    { name: "Bob Johnson", email: "bob@example.com", role: "Manager", status: "Inactive" }
+];
+
+const table = UI.table(userData, {
+    striped: true,
+    hoverable: true,
+    sortable: true
+});
+
+UI.insert('#table-demo-js', table);
+                </div>
+                <div class="demo-area" id="table-demo-js">
+                    <button class="action-btn" onclick="demoTable()">Generate Table</button>
+                </div>
+            </div>
+
+            <div id="table-data" class="method-content">
+                <div class="code-block">
+// Auto-generate table from any data structure
+const salesData = [
+    { product: "Widget A", sales: 150, revenue: "$1,500" },
+    { product: "Widget B", sales: 200, revenue: "$2,000" },
+    { product: "Widget C", sales: 75, revenue: "$750" }
+];
+
+const salesTable = UI.table(salesData, {
+    striped: true,
+    bordered: true
+});
+
+UI.insert('#table-demo-data', salesTable);
+                </div>
+                <div class="demo-area" id="table-demo-data">
+                    <button class="action-btn" onclick="demoSalesTable()">Generate Sales Table</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Alert Examples -->
+        <div class="example-section">
+            <h2 class="example-title">Alert Component</h2>
+            <p class="example-description">Show notifications, warnings, and feedback messages to users with auto-dismiss functionality.</p>
+            
+            <div class="method-tabs">
+                <button class="method-tab active" onclick="showMethod('alert', 'html')">HTML Tags</button>
+                <button class="method-tab" onclick="showMethod('alert', 'js')">JavaScript API</button>
+                <button class="method-tab" onclick="showMethod('alert', 'quick')">Quick Methods</button>
+            </div>
+
+            <div id="alert-html" class="method-content active">
+                <div class="code-block">
+&lt;ui-alert 
+    type="success"
+    message="Operation completed successfully!"
+    duration="5000"
+    dismissible="true"
+&gt;&lt;/ui-alert&gt;
+                </div>
+                <div class="demo-area" id="alert-demo-html">
+                    <ui-alert 
+                        type="success"
+                        message="Operation completed successfully!"
+                        duration="5000"
+                        dismissible="true">
+                    </ui-alert>
+                </div>
+            </div>
+
+            <div id="alert-js" class="method-content">
+                <div class="code-block">
+// Create custom alert
+const alert = UI.alert("This is a custom message", "info", {
+    duration: 3000,
+    dismissible: true
+});
+
+UI.insert('#alert-demo-js', alert);
+                </div>
+                <div class="demo-area" id="alert-demo-js">
+                    <button class="action-btn" onclick="demoAlert()">Show Alert</button>
+                </div>
+            </div>
+
+            <div id="alert-quick" class="method-content">
+                <div class="code-block">
+// Quick alert methods
+UI.success("Success message here");
+UI.error("Error message here");
+UI.warning("Warning message here");
+UI.info("Info message here");
+                </div>
+                <div class="demo-area" id="alert-demo-quick">
+                    <div class="quick-actions">
+                        <button class="action-btn" onclick="UI.success('Success! Operation completed.')">Success</button>
+                        <button class="action-btn" onclick="UI.error('Error! Something went wrong.')">Error</button>
+                        <button class="action-btn" onclick="UI.warning('Warning! Please check your input.')">Warning</button>
+                        <button class="action-btn" onclick="UI.info('Info! Here is some information.')">Info</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Badge Examples -->
+        <div class="example-section">
+            <h2 class="example-title">Badge Component</h2>
+            <p class="example-description">Display status indicators, labels, and notifications with different colors and sizes.</p>
+            
+            <div class="method-tabs">
+                <button class="method-tab active" onclick="showMethod('badge', 'html')">HTML Tags</button>
+                <button class="method-tab" onclick="showMethod('badge', 'js')">JavaScript API</button>
+                <button class="method-tab" onclick="showMethod('badge', 'variants')">Color Variants</button>
+            </div>
+
+            <div id="badge-html" class="method-content active">
+                <div class="code-block">
+&lt;ui-badge label="New" color="primary" size="medium"&gt;&lt;/ui-badge&gt;
+&lt;ui-badge label="Active" color="success" size="small"&gt;&lt;/ui-badge&gt;
+&lt;ui-badge label="Warning" color="warning" size="large"&gt;&lt;/ui-badge&gt;
+                </div>
+                <div class="demo-area" id="badge-demo-html">
+                    <ui-badge label="New" color="primary" size="medium"></ui-badge>
+                    <ui-badge label="Active" color="success" size="small"></ui-badge>
+                    <ui-badge label="Warning" color="warning" size="large"></ui-badge>
+                </div>
+            </div>
+
+            <div id="badge-js" class="method-content">
+                <div class="code-block">
+// Create badges programmatically
+const badges = [
+    UI.badge("New", "primary"),
+    UI.badge("Active", "success"),
+    UI.badge("Warning", "warning"),
+    UI.badge("Error", "danger")
+].join('');
+
+UI.insert('#badge-demo-js', badges);
+                </div>
+                <div class="demo-area" id="badge-demo-js">
+                    <button class="action-btn" onclick="demoBadges()">Generate Badges</button>
+                </div>
+            </div>
+
+            <div id="badge-variants" class="method-content">
+                <div class="demo-area" id="badge-demo-variants">
+                    <h4>Color Variants:</h4>
+                    <ui-badge label="Primary" color="primary"></ui-badge>
+                    <ui-badge label="Success" color="success"></ui-badge>
+                    <ui-badge label="Warning" color="warning"></ui-badge>
+                    <ui-badge label="Danger" color="danger"></ui-badge>
+                    
+                    <h4>Size Variants:</h4>
+                    <ui-badge label="Small" color="primary" size="small"></ui-badge>
+                    <ui-badge label="Medium" color="primary" size="medium"></ui-badge>
+                    <ui-badge label="Large" color="primary" size="large"></ui-badge>
+                </div>
+            </div>
+        </div>
+
+        <!-- Avatar Examples -->
+        <div class="example-section">
+            <h2 class="example-title">Avatar Component</h2>
+            <p class="example-description">Display user profile images or fallback icons with different sizes and styles.</p>
+            
+            <div class="method-tabs">
+                <button class="method-tab active" onclick="showMethod('avatar', 'html')">HTML Tags</button>
+                <button class="method-tab" onclick="showMethod('avatar', 'js')">JavaScript API</button>
+                <button class="method-tab" onclick="showMethod('avatar', 'variants')">Size Variants</button>
+            </div>
+
+            <div id="avatar-html" class="method-content active">
+                <div class="code-block">
+&lt;ui-avatar src="https://example.com/avatar.jpg" size="medium"&gt;&lt;/ui-avatar&gt;
+&lt;ui-avatar src="👤" size="large"&gt;&lt;/ui-avatar&gt;
+                </div>
+                <div class="demo-area" id="avatar-demo-html">
+                    <ui-avatar src="https://picsum.photos/100/100" size="medium"></ui-avatar>
+                    <ui-avatar src="👤" size="large"></ui-avatar>
+                </div>
+            </div>
+
+            <div id="avatar-js" class="method-content">
+                <div class="code-block">
+// Create avatars with different options
+const avatars = [
+    UI.avatar("https://picsum.photos/100/100", { size: "small" }),
+    UI.avatar("👤", { size: "medium" }),
+    UI.avatar("", { size: "large", fallback: "😊" })
+].join('');
+
+UI.insert('#avatar-demo-js', avatars);
+                </div>
+                <div class="demo-area" id="avatar-demo-js">
+                    <button class="action-btn" onclick="demoAvatars()">Generate Avatars</button>
+                </div>
+            </div>
+
+            <div id="avatar-variants" class="method-content">
+                <div class="demo-area" id="avatar-demo-variants">
+                    <h4>Size Variants:</h4>
+                    <ui-avatar src="👤" size="small"></ui-avatar>
+                    <ui-avatar src="👤" size="medium"></ui-avatar>
+                    <ui-avatar src="👤" size="large"></ui-avatar>
+                    
+                    <h4>Different Icons:</h4>
+                    <ui-avatar src="😊"></ui-avatar>
+                    <ui-avatar src="🎭"></ui-avatar>
+                    <ui-avatar src="🌟"></ui-avatar>
+                </div>
+            </div>
+        </div>
+
+        <!-- Chips Examples -->
+        <div class="example-section">
+            <h2 class="example-title">Chips Component</h2>
+            <p class="example-description">Display tags, categories, and filters with a clean, modern design.</p>
+            
+            <div class="method-tabs">
+                <button class="method-tab active" onclick="showMethod('chips', 'html')">HTML Tags</button>
+                <button class="method-tab" onclick="showMethod('chips', 'js')">JavaScript API</button>
+                <button class="method-tab" onclick="showMethod('chips', 'variants')">Color Variants</button>
+            </div>
+
+            <div id="chips-html" class="method-content active">
+                <div class="code-block">
+&lt;ui-chips 
+    labels="React,Vue,Angular,TypeScript"
+    color="primary"
+    removable="true"
+&gt;&lt;/ui-chips&gt;
+                </div>
+                <div class="demo-area" id="chips-demo-html">
+                    <ui-chips 
+                        labels="React,Vue,Angular,TypeScript"
+                        color="primary"
+                        removable="true">
+                    </ui-chips>
+                </div>
+            </div>
+
+            <div id="chips-js" class="method-content">
+                <div class="code-block">
+// Create chips from array
+const technologies = ["React", "Vue", "Angular", "TypeScript"];
+const chips = UI.chips(technologies, {
+    color: "primary",
+    removable: true
+});
+
+UI.insert('#chips-demo-js', chips);
+                </div>
+                <div class="demo-area" id="chips-demo-js">
+                    <button class="action-btn" onclick="demoChips()">Generate Chips</button>
+                </div>
+            </div>
+
+            <div id="chips-variants" class="method-content">
+                <div class="demo-area" id="chips-demo-variants">
+                    <h4>Color Variants:</h4>
+                    <ui-chips labels="Primary,Theme" color="primary"></ui-chips>
+                    <ui-chips labels="Secondary,Theme" color="secondary"></ui-chips>
+                    
+                    <h4>Different Categories:</h4>
+                    <ui-chips labels="Frontend,Backend,Database" color="primary"></ui-chips>
+                    <ui-chips labels="Design,Development,Testing" color="secondary"></ui-chips>
+                </div>
+            </div>
+        </div>
+
+        <!-- Accordion Examples -->
+        <div class="example-section">
+            <h2 class="example-title">Accordion Component</h2>
+            <p class="example-description">Create collapsible content sections for FAQs, documentation, and organized information.</p>
+            
+            <div class="method-tabs">
+                <button class="method-tab active" onclick="showMethod('accordion', 'html')">HTML Tags</button>
+                <button class="method-tab" onclick="showMethod('accordion', 'js')">JavaScript API</button>
+                <button class="method-tab" onclick="showMethod('accordion', 'faq')">FAQ Example</button>
+            </div>
+
+            <div id="accordion-html" class="method-content active">
+                <div class="code-block">
+&lt;ui-accordion 
+    items='[{"title":"Section 1","content":"Content for section 1"},{"title":"Section 2","content":"Content for section 2"}]'
+    multiple="false"
+    defaultOpen="0"
+&gt;&lt;/ui-accordion&gt;
+                </div>
+                <div class="demo-area" id="accordion-demo-html">
+                    <ui-accordion 
+                        items='[{"title":"Section 1","content":"Content for section 1"},{"title":"Section 2","content":"Content for section 2"}]'
+                        multiple="false"
+                        defaultOpen="0">
+                    </ui-accordion>
+                </div>
+            </div>
+
+            <div id="accordion-js" class="method-content">
+                <div class="code-block">
+// Create accordion from array
+const items = [
+    { title: "How to use components?", content: "Simply include the component files and use the custom HTML tags." },
+    { title: "Can I customize styles?", content: "Yes! All components use CSS custom properties for easy theming." },
+    { title: "Is it responsive?", content: "Absolutely! All components are fully responsive and mobile-friendly." }
+];
+
+const accordion = UI.accordion(items, {
+    multiple: true,
+    defaultOpen: 0
+});
+
+UI.insert('#accordion-demo-js', accordion);
+                </div>
+                <div class="demo-area" id="accordion-demo-js">
+                    <button class="action-btn" onclick="demoAccordion()">Generate Accordion</button>
+                </div>
+            </div>
+
+            <div id="accordion-faq" class="method-content">
+                <div class="demo-area" id="accordion-demo-faq">
+                    <h4>Frequently Asked Questions:</h4>
+                    <ui-accordion 
+                        items='[{"title":"What is this component library?","content":"A modern UI component library built with Chota CSS and Open Props, featuring reusable components implemented as custom HTML tags."},{"title":"How do I get started?","content":"Include the component files in your project and start using the custom HTML tags with appropriate attributes."},{"title":"Can I use it in production?","content":"Yes! The components are production-ready with proper accessibility, responsive design, and cross-browser compatibility."}]'
+                        multiple="false"
+                        defaultOpen="0">
+                    </ui-accordion>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showMethod(component, method) {
+            // Hide all method contents for this component
+            const contents = document.querySelectorAll(`#${component}-html, #${component}-js, #${component}-builder, #${component}-data, #${component}-quick, #${component}-variants, #${component}-faq`);
+            contents.forEach(content => content.classList.remove('active'));
+            
+            // Show selected method content
+            const selectedContent = document.getElementById(`${component}-${method}`);
+            if (selectedContent) {
+                selectedContent.classList.add('active');
+            }
+            
+            // Update tab states
+            const tabs = document.querySelectorAll(`#${component}-html, #${component}-js, #${component}-builder, #${component}-data, #${component}-quick, #${component}-variants, #${component}-faq`).parentElement.querySelectorAll('.method-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        // Demo functions
+        function demoCard() {
+            const card = UI.card({
+                title: "Demo Product",
+                subtitle: "Premium Category",
+                image: "https://picsum.photos/400/250?random=1",
+                content: "This is a demo card created using the JavaScript API. It shows how easy it is to generate components programmatically.",
+                actionText: "Learn More",
+                actionLink: "#",
+                badge: "Demo",
+                variant: "elevated",
+                size: "medium"
+            });
+            UI.replace('#card-demo-js', card);
+        }
+
+        function demoTable() {
+            const userData = [
+                { name: "John Doe", email: "john@example.com", role: "Developer", status: "Active" },
+                { name: "Jane Smith", email: "jane@example.com", role: "Designer", status: "Active" },
+                { name: "Bob Johnson", email: "bob@example.com", role: "Manager", status: "Inactive" }
+            ];
+            const table = UI.table(userData, { striped: true, hoverable: true });
+            UI.replace('#table-demo-js', table);
+        }
+
+        function demoSalesTable() {
+            const salesData = [
+                { product: "Widget A", sales: 150, revenue: "$1,500" },
+                { product: "Widget B", sales: 200, revenue: "$2,000" },
+                { product: "Widget C", sales: 75, revenue: "$750" }
+            ];
+            const table = UI.table(salesData, { striped: true, bordered: true });
+            UI.replace('#table-demo-data', table);
+        }
+
+        function demoAlert() {
+            const alert = UI.alert("This is a demo alert created using the JavaScript API!", "info", {
+                duration: 5000,
+                dismissible: true
+            });
+            UI.insert('#alert-demo-js', alert);
+        }
+
+        function demoBadges() {
+            const badges = [
+                UI.badge("New", "primary"),
+                UI.badge("Active", "success"),
+                UI.badge("Warning", "warning"),
+                UI.badge("Error", "danger")
+            ].join('');
+            UI.replace('#badge-demo-js', badges);
+        }
+
+        function demoAvatars() {
+            const avatars = [
+                UI.avatar("https://picsum.photos/100/100?random=1", { size: "small" }),
+                UI.avatar("👤", { size: "medium" }),
+                UI.avatar("", { size: "large", fallback: "😊" })
+            ].join('');
+            UI.replace('#avatar-demo-js', avatars);
+        }
+
+        function demoChips() {
+            const technologies = ["React", "Vue", "Angular", "TypeScript"];
+            const chips = UI.chips(technologies, { color: "primary", removable: true });
+            UI.replace('#chips-demo-js', chips);
+        }
+
+        function demoAccordion() {
+            const items = [
+                { title: "How to use components?", content: "Simply include the component files and use the custom HTML tags with appropriate attributes." },
+                { title: "Can I customize styles?", content: "Yes! All components use CSS custom properties that can be easily overridden for your specific design needs." },
+                { title: "Is it responsive?", content: "Absolutely! All components are fully responsive and work across desktop, tablet, and mobile devices." }
+            ];
+            const accordion = UI.accordion(items, { multiple: true, defaultOpen: 0 });
+            UI.replace('#accordion-demo-js', accordion);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,631 @@
+<!-- Enhanced Interactive Map Component -->
+<div class="demo-section">
+    <h2 class="demo-title">22. Enhanced Interactive Map Component</h2>
+    <ui-enhanced-map 
+        mainLocations="San Francisco,37.7749,-122.4194;Los Angeles,34.0522,-118.2437;Las Vegas,36.1699,-115.1398"
+        nearbyLocations="Sacramento,38.5816,-121.4944;San Diego,32.7157,-117.1611;Phoenix,33.4484,-112.0740"
+        center="36.1699,-115.1398"
+        zoom="6"
+        height="700px"
+        showDirections="true"
+        showNearbyMarkers="true"
+        showTraffic="true"
+        showPublicTransport="true"
+        mainMarkerColor="#4ECDC4"
+        nearbyMarkerColor="#FF6B6B"
+        routeColor="#FF4500"
+        theme="dark"
+        interactive="true">
+    </ui-enhanced-map>
+    
+    <!-- Product Cards Section -->
+    <div class="product-cards-section">
+        <h3 class="product-section-title">Featured Products Near You</h3>
+        <div class="product-cards-grid">
+            <ui-card 
+                title="Premium Coffee Blend"
+                subtitle="Artisan Roasted"
+                image="https://picsum.photos/300/200?random=10"
+                content="Discover our signature coffee blend, carefully crafted from the finest beans sourced from local farms. Perfect for coffee enthusiasts."
+                actionText="Order Now"
+                actionLink="#"
+                secondaryActionText="View Details"
+                secondaryActionLink="#"
+                badge="Popular"
+                variant="default"
+                size="medium">
+            </ui-card>
+            
+            <ui-card 
+                title="Organic Tea Collection"
+                subtitle="Handcrafted"
+                image="https://picsum.photos/300/200?random=11"
+                content="A curated selection of organic teas, each with unique flavors and health benefits. Perfect for relaxation and wellness."
+                actionText="Shop Now"
+                actionLink="#"
+                secondaryActionText="Learn More"
+                secondaryActionLink="#"
+                badge="New"
+                variant="default"
+                size="medium">
+            </ui-card>
+            
+            <ui-card 
+                title="Local Artisan Bread"
+                subtitle="Fresh Daily"
+                image="https://picsum.photos/300/200?random=12"
+                content="Freshly baked artisan bread made with traditional methods and premium ingredients. Available daily at select locations."
+                actionText="Find Location"
+                actionLink="#"
+                secondaryActionText="Menu"
+                secondaryActionLink="#"
+                badge="Fresh"
+                variant="default"
+                size="medium">
+            </ui-card>
+        </div>
+    </div>
+</div>
+
+<style>
+ui-enhanced-map {
+    display: block;
+    border-radius: var(--radius-size);
+    overflow: hidden;
+    box-shadow: var(--shadow-medium);
+    background: var(--surface-1);
+}
+
+ui-enhanced-map .map-container {
+    width: 100%;
+    height: 700px;
+    position: relative;
+}
+
+ui-enhanced-map .map-controls {
+    position: absolute;
+    top: var(--size-2);
+    right: var(--size-2);
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-1);
+    z-index: 1000;
+}
+
+ui-enhanced-map .map-control {
+    background: white;
+    border: 1px solid var(--surface-3);
+    border-radius: var(--radius-size);
+    padding: var(--size-2);
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s var(--animation-smooth);
+    box-shadow: var(--shadow-soft);
+    white-space: nowrap;
+}
+
+ui-enhanced-map .map-control:hover {
+    background: var(--surface-2);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-medium);
+}
+
+ui-enhanced-map .map-control.active {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+}
+
+ui-enhanced-map .map-control.active::after {
+    content: " ON";
+    font-size: 10px;
+    opacity: 0.8;
+}
+
+ui-enhanced-map .map-info {
+    position: absolute;
+    bottom: var(--size-2);
+    left: var(--size-2);
+    background: rgba(255, 255, 255, 0.9);
+    padding: var(--size-2) var(--size-3);
+    border-radius: var(--radius-size);
+    font-size: 0.8rem;
+    color: var(--text-2);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+    max-width: 300px;
+}
+
+ui-enhanced-map .map-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background: var(--surface-2);
+    color: var(--text-2);
+    font-size: 0.9rem;
+}
+
+ui-enhanced-map .map-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background: var(--color-danger);
+    color: white;
+    font-size: 0.9rem;
+    text-align: center;
+    padding: var(--size-3);
+}
+
+ui-enhanced-map .route-arrow {
+    background-color: var(--color-primary);
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+/* Product Cards Section Styles */
+.product-cards-section {
+    margin-top: 2rem;
+    padding: 2rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: var(--radius-size);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.product-section-title {
+    color: var(--color-dark);
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.product-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+/* Card Component Styles (for product cards) */
+ui-card {
+    display: block;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(20px);
+    border-radius: var(--radius-size);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: var(--shadow-soft);
+    overflow: hidden;
+    transition: all 0.4s var(--animation-smooth);
+    position: relative;
+}
+
+ui-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--gradient-primary);
+    transform: scaleX(0);
+    transition: transform 0.4s var(--animation-smooth);
+}
+
+ui-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: var(--shadow-large), var(--shadow-glow);
+}
+
+ui-card:hover::before {
+    transform: scaleX(1);
+}
+
+ui-card .card-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    transition: transform 0.4s var(--animation-smooth);
+}
+
+ui-card:hover .card-image {
+    transform: scale(1.05);
+}
+
+ui-card .card-content {
+    padding: 1.5rem;
+}
+
+ui-card .card-title {
+    font-size: 1.3rem;
+    font-weight: 700;
+    margin: 0 0 0.5rem 0;
+    background: var(--gradient-primary);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+ui-card .card-subtitle {
+    font-size: 0.9rem;
+    color: var(--color-dark);
+    opacity: 0.7;
+    margin: 0 0 1rem 0;
+    font-weight: 500;
+}
+
+ui-card .card-text {
+    color: var(--color-dark);
+    line-height: 1.6;
+    margin: 0 0 1.5rem 0;
+    opacity: 0.8;
+    font-size: 0.9rem;
+}
+
+ui-card .card-actions {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+ui-card .card-action {
+    padding: 0.5rem 1rem;
+    background: var(--gradient-primary);
+    color: white;
+    text-decoration: none;
+    border-radius: var(--radius-size);
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.3s var(--animation-smooth);
+    border: none;
+    cursor: pointer;
+}
+
+ui-card .card-action:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-medium);
+}
+
+ui-card .card-action.secondary {
+    background: transparent;
+    color: var(--color-primary);
+    border: 2px solid var(--color-primary);
+}
+
+ui-card .card-action.secondary:hover {
+    background: var(--color-primary);
+    color: white;
+}
+
+ui-card .card-badge {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: var(--color-success);
+    color: white;
+    padding: 0.25rem 0.75rem;
+    border-radius: var(--radius-size);
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+</style>
+
+<script>
+// Enhanced Interactive Map Component Initialization
+function initEnhancedMaps() {
+    document.querySelectorAll('ui-enhanced-map').forEach(mapElement => {
+        const mainLocations = mapElement.getAttribute('mainLocations');
+        const nearbyLocations = mapElement.getAttribute('nearbyLocations');
+        const center = mapElement.getAttribute('center');
+        const zoom = parseInt(mapElement.getAttribute('zoom')) || 10;
+        const height = mapElement.getAttribute('height') || '700px';
+        const showDirections = mapElement.getAttribute('showDirections') === 'true';
+        const showNearbyMarkers = mapElement.getAttribute('showNearbyMarkers') === 'true';
+        const showTraffic = mapElement.getAttribute('showTraffic') === 'true';
+        const showPublicTransport = mapElement.getAttribute('showPublicTransport') === 'true';
+        const mainMarkerColor = mapElement.getAttribute('mainMarkerColor') || '#4ECDC4';
+        const nearbyMarkerColor = mapElement.getAttribute('nearbyMarkerColor') || '#FF6B6B';
+        const routeColor = mapElement.getAttribute('routeColor') || '#FF4500';
+        const theme = mapElement.getAttribute('theme') || 'light';
+        const interactive = mapElement.getAttribute('interactive') === 'true';
+        
+        mapElement.classList.add(theme);
+        
+        // Set height
+        const container = mapElement.querySelector('.map-container') || mapElement;
+        container.style.height = height;
+        
+        // Parse locations
+        const mainLocationList = mainLocations ? mainLocations.split(';').map(loc => {
+            const [name, lat, lng] = loc.split(',');
+            return { name: name.trim(), lat: parseFloat(lat), lng: parseFloat(lng) };
+        }) : [];
+        
+        const nearbyLocationList = nearbyLocations ? nearbyLocations.split(';').map(loc => {
+            const [name, lat, lng] = loc.split(',');
+            return { name: name.trim(), lat: parseFloat(lat), lng: parseFloat(lng) };
+        }) : [];
+        
+        // Parse center
+        const [centerLat, centerLng] = center ? center.split(',').map(Number) : [0, 0];
+        
+        // Create map HTML
+        let mapHTML = '<div class="map-container">';
+        mapHTML += '<div class="map-loading">Loading enhanced map...</div>';
+        
+        if (interactive) {
+            mapHTML += '<div class="map-controls">';
+            if (showDirections && mainLocationList.length > 1) {
+                mapHTML += '<button class="map-control" data-action="toggle-routes">🛣️ Route</button>';
+            }
+            if (showNearbyMarkers && nearbyLocationList.length > 0) {
+                mapHTML += '<button class="map-control" data-action="toggle-nearby">📍 Nearby</button>';
+            }
+            if (showTraffic) {
+                mapHTML += '<button class="map-control" data-action="toggle-traffic">🚦 Traffic</button>';
+            }
+            if (showPublicTransport) {
+                mapHTML += '<button class="map-control" data-action="toggle-transport">🚌 Transport</button>';
+            }
+            mapHTML += '</div>';
+        }
+        
+        mapHTML += '<div class="map-info">Enhanced map with multiple location types and interactive controls</div>';
+        mapHTML += '</div>';
+        
+        mapElement.innerHTML = mapHTML;
+        
+        // Initialize map when Leaflet is available
+        const initMap = () => {
+            if (typeof L === 'undefined') {
+                setTimeout(initMap, 100);
+                return;
+            }
+            
+            try {
+                const mapContainer = mapElement.querySelector('.map-container');
+                const loading = mapElement.querySelector('.map-loading');
+                
+                // Remove loading message
+                loading.remove();
+                
+                // Create map
+                const map = L.map(mapContainer).setView([centerLat, centerLng], zoom);
+                
+                // Add tile layer
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+                
+                // Create layer groups
+                map.mainLayer = L.layerGroup().addTo(map);
+                map.nearbyLayer = L.layerGroup().addTo(map);
+                map.routeLayer = L.layerGroup().addTo(map);
+                map.trafficLayer = L.layerGroup().addTo(map);
+                map.transportLayer = L.layerGroup().addTo(map);
+                
+                // Add main location markers
+                mainLocationList.forEach(location => {
+                    const marker = L.marker([location.lat, location.lng], {
+                        icon: L.divIcon({
+                            className: 'main-marker',
+                            html: `<div style="
+                                background-color: ${mainMarkerColor};
+                                width: 20px;
+                                height: 20px;
+                                border-radius: 50%;
+                                border: 3px solid white;
+                                box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+                            "></div>`,
+                            iconSize: [20, 20],
+                            iconAnchor: [10, 10]
+                        })
+                    }).addTo(map.mainLayer);
+                    
+                    marker.bindPopup(`<b>${location.name}</b><br>Main Location<br>Lat: ${location.lat}<br>Lng: ${location.lng}`);
+                });
+                
+                // Add nearby location markers (initially hidden)
+                nearbyLocationList.forEach(location => {
+                    const marker = L.marker([location.lat, location.lng], {
+                        icon: L.divIcon({
+                            className: 'nearby-marker',
+                            html: `<div style="
+                                background-color: ${nearbyMarkerColor};
+                                width: 16px;
+                                height: 16px;
+                                border-radius: 50%;
+                                border: 2px solid white;
+                                box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                            "></div>`,
+                            iconSize: [16, 16],
+                            iconAnchor: [8, 8]
+                        })
+                    }).addTo(map.nearbyLayer);
+                    
+                    marker.bindPopup(`<b>${location.name}</b><br>Nearby Location<br>Lat: ${location.lat}<br>Lng: ${location.lng}`);
+                });
+                
+                // Initially hide nearby layer
+                map.removeLayer(map.nearbyLayer);
+                
+                // Store map reference
+                mapElement.map = map;
+                
+                // Add control handlers
+                const controls = mapElement.querySelectorAll('.map-control');
+                controls.forEach(control => {
+                    control.addEventListener('click', () => {
+                        const action = control.getAttribute('data-action');
+                        control.classList.toggle('active');
+                        
+                        if (action === 'toggle-routes') {
+                            if (map.routeLayer) {
+                                if (map.hasLayer(map.routeLayer)) {
+                                    map.removeLayer(map.routeLayer);
+                                    map.routeLayer = null;
+                                } else {
+                                    // Create route between main locations
+                                    if (mainLocationList.length > 1) {
+                                        const routePoints = mainLocationList.map(loc => [loc.lat, loc.lng]);
+                                        
+                                        // Create shadow route
+                                        const shadowRoute = L.polyline(routePoints, {
+                                            color: '#000',
+                                            weight: 14,
+                                            opacity: 0.4
+                                        }).addTo(map.routeLayer);
+                                        
+                                        // Create main route
+                                        const mainRoute = L.polyline(routePoints, {
+                                            color: routeColor,
+                                            weight: 10,
+                                            opacity: 1.0
+                                        }).addTo(map.routeLayer);
+                                        
+                                        // Add direction arrows
+                                        const arrowIcon = L.divIcon({
+                                            className: 'route-arrow',
+                                            html: `<div style="
+                                                background-color: ${routeColor};
+                                                width: 12px;
+                                                height: 12px;
+                                                border-radius: 50%;
+                                                border: 2px solid white;
+                                                box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+                                            "></div>`,
+                                            iconSize: [12, 12],
+                                            iconAnchor: [6, 6]
+                                        });
+                                        
+                                        // Add arrows at midpoints of route segments
+                                        for (let i = 0; i < routePoints.length - 1; i++) {
+                                            const start = routePoints[i];
+                                            const end = routePoints[i + 1];
+                                            const midLat = (start[0] + end[0]) / 2;
+                                            const midLng = (start[1] + end[1]) / 2;
+                                            
+                                            L.marker([midLat, midLng], { icon: arrowIcon }).addTo(map.routeLayer);
+                                        }
+                                        
+                                        // Bring the main route to front
+                                        mainRoute.bringToFront();
+                                    }
+                                    
+                                    map.routeLayer.addTo(map);
+                                }
+                            }
+                        } else if (action === 'toggle-nearby') {
+                            if (map.hasLayer(map.nearbyLayer)) {
+                                map.removeLayer(map.nearbyLayer);
+                            } else {
+                                map.nearbyLayer.addTo(map);
+                            }
+                        } else if (action === 'toggle-traffic') {
+                            // Simulate traffic layer
+                            if (map.hasLayer(map.trafficLayer)) {
+                                map.removeLayer(map.trafficLayer);
+                            } else {
+                                // Add simulated traffic indicators
+                                mainLocationList.forEach(location => {
+                                    const trafficMarker = L.circle([location.lat + 0.01, location.lng + 0.01], {
+                                        color: 'red',
+                                        fillColor: '#f03',
+                                        fillOpacity: 0.5,
+                                        radius: 500
+                                    }).addTo(map.trafficLayer);
+                                    
+                                    trafficMarker.bindPopup('Traffic congestion detected');
+                                });
+                                map.trafficLayer.addTo(map);
+                            }
+                        } else if (action === 'toggle-transport') {
+                            // Simulate public transport layer
+                            if (map.hasLayer(map.transportLayer)) {
+                                map.removeLayer(map.transportLayer);
+                            } else {
+                                // Add simulated transport stops
+                                mainLocationList.forEach(location => {
+                                    const transportMarker = L.marker([location.lat - 0.01, location.lng - 0.01], {
+                                        icon: L.divIcon({
+                                            className: 'transport-marker',
+                                            html: '🚌',
+                                            iconSize: [20, 20],
+                                            iconAnchor: [10, 10]
+                                        })
+                                    }).addTo(map.transportLayer);
+                                    
+                                    transportMarker.bindPopup('Public transport stop');
+                                });
+                                map.transportLayer.addTo(map);
+                            }
+                        }
+                    });
+                });
+                
+            } catch (error) {
+                console.error('Error initializing enhanced map:', error);
+                const errorDiv = mapElement.querySelector('.map-loading') || document.createElement('div');
+                errorDiv.className = 'map-error';
+                errorDiv.textContent = 'Failed to load enhanced map. Please check your internet connection.';
+                if (!mapElement.querySelector('.map-error')) {
+                    mapElement.querySelector('.map-container').appendChild(errorDiv);
+                }
+            }
+        };
+        
+        // Start initialization
+        initMap();
+    });
+}
+
+// Product Cards Initialization
+function initProductCards() {
+    document.querySelectorAll('ui-card').forEach(card => {
+        const title = card.getAttribute('title');
+        const subtitle = card.getAttribute('subtitle');
+        const image = card.getAttribute('image');
+        const content = card.getAttribute('content');
+        const actionText = card.getAttribute('actionText');
+        const actionLink = card.getAttribute('actionLink');
+        const secondaryActionText = card.getAttribute('secondaryActionText');
+        const secondaryActionLink = card.getAttribute('secondaryActionLink');
+        const badge = card.getAttribute('badge');
+        const variant = card.getAttribute('variant') || 'default';
+        const size = card.getAttribute('size') || 'medium';
+
+        card.className = `card-${variant} card-${size}`;
+
+        let actionsHTML = '';
+        if (actionText) {
+            actionsHTML += `<a href="${actionLink || '#'}" class="card-action">${actionText}</a>`;
+        }
+        if (secondaryActionText) {
+            actionsHTML += `<a href="${secondaryActionLink || '#'}" class="card-action secondary">${secondaryActionText}</a>`;
+        }
+
+        card.innerHTML = `
+            ${badge ? `<div class="card-badge">${badge}</div>` : ''}
+            ${image ? `<img src="${image}" alt="${title}" class="card-image">` : ''}
+            <div class="card-content">
+                ${title ? `<h3 class="card-title">${title}</h3>` : ''}
+                ${subtitle ? `<p class="card-subtitle">${subtitle}</p>` : ''}
+                ${content ? `<p class="card-text">${content}</p>` : ''}
+                ${actionsHTML ? `<div class="card-actions">${actionsHTML}</div>` : ''}
+            </div>
+        `;
+    });
+}
+
+// Initialize enhanced maps when DOM is loaded
+document.addEventListener('DOMContentLoaded', () => {
+    initEnhancedMaps();
+    initProductCards();
+});
+</script>

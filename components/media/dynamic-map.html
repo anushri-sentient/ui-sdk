@@ -1,0 +1,238 @@
+<!-- Dynamic Map Component -->
+<div class="demo-section">
+    <h2 class="demo-title">21. Dynamic Map Component</h2>
+    <ui-map 
+        locations="New York,40.7128,-74.0060;London,51.5074,-0.1278;Tokyo,35.6762,139.6503;Paris,48.8566,2.3522"
+        center="40.7128,-74.0060"
+        zoom="4"
+        height="500px"
+        showMarkers="true"
+        showRoutes="false"
+        routeColor="#FF6B6B"
+        markerColor="#4ECDC4"
+        theme="light"
+        interactive="true">
+    </ui-map>
+</div>
+
+<style>
+ui-map {
+    display: block;
+    border-radius: var(--radius-size);
+    overflow: hidden;
+    box-shadow: var(--shadow-medium);
+    background: var(--surface-1);
+}
+
+ui-map .map-container {
+    width: 100%;
+    height: 500px;
+    position: relative;
+}
+
+ui-map .map-controls {
+    position: absolute;
+    top: var(--size-2);
+    right: var(--size-2);
+    display: flex;
+    flex-direction: column;
+    gap: var(--size-1);
+    z-index: 1000;
+}
+
+ui-map .map-control {
+    background: white;
+    border: 1px solid var(--surface-3);
+    border-radius: var(--radius-size);
+    padding: var(--size-2);
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s var(--animation-smooth);
+    box-shadow: var(--shadow-soft);
+}
+
+ui-map .map-control:hover {
+    background: var(--surface-2);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-medium);
+}
+
+ui-map .map-control.active {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+}
+
+ui-map .map-info {
+    position: absolute;
+    bottom: var(--size-2);
+    left: var(--size-2);
+    background: rgba(255, 255, 255, 0.9);
+    padding: var(--size-2) var(--size-3);
+    border-radius: var(--radius-size);
+    font-size: 0.8rem;
+    color: var(--text-2);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+}
+
+ui-map .map-loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background: var(--surface-2);
+    color: var(--text-2);
+    font-size: 0.9rem;
+}
+
+ui-map .map-error {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    background: var(--color-danger);
+    color: white;
+    font-size: 0.9rem;
+    text-align: center;
+    padding: var(--size-3);
+}
+</style>
+
+<script>
+// Dynamic Map Component Initialization
+function initDynamicMaps() {
+    document.querySelectorAll('ui-map').forEach(mapElement => {
+        const locations = mapElement.getAttribute('locations');
+        const center = mapElement.getAttribute('center');
+        const zoom = parseInt(mapElement.getAttribute('zoom')) || 10;
+        const height = mapElement.getAttribute('height') || '500px';
+        const showMarkers = mapElement.getAttribute('showMarkers') === 'true';
+        const showRoutes = mapElement.getAttribute('showRoutes') === 'true';
+        const routeColor = mapElement.getAttribute('routeColor') || '#FF6B6B';
+        const markerColor = mapElement.getAttribute('markerColor') || '#4ECDC4';
+        const theme = mapElement.getAttribute('theme') || 'light';
+        const interactive = mapElement.getAttribute('interactive') === 'true';
+        
+        mapElement.classList.add(theme);
+        
+        // Set height
+        const container = mapElement.querySelector('.map-container') || mapElement;
+        container.style.height = height;
+        
+        // Parse locations
+        const locationList = locations ? locations.split(';').map(loc => {
+            const [name, lat, lng] = loc.split(',');
+            return { name: name.trim(), lat: parseFloat(lat), lng: parseFloat(lng) };
+        }) : [];
+        
+        // Parse center
+        const [centerLat, centerLng] = center ? center.split(',').map(Number) : [0, 0];
+        
+        // Create map HTML
+        let mapHTML = '<div class="map-container">';
+        mapHTML += '<div class="map-loading">Loading map...</div>';
+        
+        if (interactive) {
+            mapHTML += '<div class="map-controls">';
+            if (showMarkers) {
+                mapHTML += '<button class="map-control" data-action="toggle-markers">📍 Markers</button>';
+            }
+            if (showRoutes && locationList.length > 1) {
+                mapHTML += '<button class="map-control" data-action="toggle-routes">🛣️ Routes</button>';
+            }
+            mapHTML += '</div>';
+        }
+        
+        mapHTML += '<div class="map-info">Click markers for details</div>';
+        mapHTML += '</div>';
+        
+        mapElement.innerHTML = mapHTML;
+        
+        // Initialize map when Leaflet is available
+        const initMap = () => {
+            if (typeof L === 'undefined') {
+                setTimeout(initMap, 100);
+                return;
+            }
+            
+            try {
+                const mapContainer = mapElement.querySelector('.map-container');
+                const loading = mapElement.querySelector('.map-loading');
+                
+                // Remove loading message
+                loading.remove();
+                
+                // Create map
+                const map = L.map(mapContainer).setView([centerLat, centerLng], zoom);
+                
+                // Add tile layer
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap contributors'
+                }).addTo(map);
+                
+                // Add markers if enabled
+                if (showMarkers) {
+                    locationList.forEach(location => {
+                        const marker = L.marker([location.lat, location.lng]).addTo(map);
+                        marker.bindPopup(`<b>${location.name}</b><br>Lat: ${location.lat}<br>Lng: ${location.lng}`);
+                    });
+                }
+                
+                // Add routes if enabled
+                if (showRoutes && locationList.length > 1) {
+                    const routePoints = locationList.map(loc => [loc.lat, loc.lng]);
+                    L.polyline(routePoints, {
+                        color: routeColor,
+                        weight: 3,
+                        opacity: 0.7
+                    }).addTo(map);
+                }
+                
+                // Store map reference
+                mapElement.map = map;
+                
+                // Add control handlers
+                const controls = mapElement.querySelectorAll('.map-control');
+                controls.forEach(control => {
+                    control.addEventListener('click', () => {
+                        const action = control.getAttribute('data-action');
+                        control.classList.toggle('active');
+                        
+                        if (action === 'toggle-markers') {
+                            // Toggle markers visibility
+                            const markers = mapElement.querySelectorAll('.leaflet-marker-icon');
+                            markers.forEach(marker => {
+                                marker.style.display = marker.style.display === 'none' ? 'block' : 'none';
+                            });
+                        } else if (action === 'toggle-routes') {
+                            // Toggle routes visibility
+                            const routes = mapElement.querySelectorAll('.leaflet-interactive');
+                            routes.forEach(route => {
+                                if (route.tagName === 'PATH') {
+                                    route.style.display = route.style.display === 'none' ? 'block' : 'none';
+                                }
+                            });
+                        }
+                    });
+                });
+                
+            } catch (error) {
+                console.error('Error initializing map:', error);
+                const errorDiv = mapElement.querySelector('.map-loading') || document.createElement('div');
+                errorDiv.className = 'map-error';
+                errorDiv.textContent = 'Failed to load map. Please check your internet connection.';
+                if (!mapElement.querySelector('.map-error')) {
+                    mapElement.querySelector('.map-container').appendChild(errorDiv);
+                }
+            }
+        };
+        
+        // Start initialization
+        initMap();
+    });
+}
+
+// Initialize dynamic maps when DOM is loaded
+document.addEventListener('DOMContentLoaded', initDynamicMaps);
+</script>

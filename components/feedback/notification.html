@@ -1,0 +1,153 @@
+<!-- Enhanced Alert / Notification Box -->
+<div class="demo-section">
+    <h2 class="demo-title">19. Enhanced Alert / Notification Box</h2>
+    <ui-notification 
+        type="info"
+        message="New features are available! Check out our latest updates."
+        dismissible="true"
+        action="View Updates"
+        actionLink="#"
+        theme="primary">
+    </ui-notification>
+</div>
+
+<style>
+ui-notification {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--size-3);
+    padding: var(--size-4);
+    border-radius: var(--radius-size);
+    margin: var(--size-3) 0;
+    border-left: 4px solid;
+    position: relative;
+}
+
+ui-notification.info {
+    background: hsl(200 70% 95%);
+    border-left-color: var(--color-info);
+    color: hsl(200 70% 20%);
+}
+
+ui-notification.success {
+    background: hsl(120 70% 95%);
+    border-left-color: var(--color-success);
+    color: hsl(120 70% 20%);
+}
+
+ui-notification.warning {
+    background: hsl(45 100% 95%);
+    border-left-color: var(--color-warning);
+    color: hsl(45 100% 20%);
+}
+
+ui-notification.error {
+    background: hsl(0 70% 95%);
+    border-left-color: var(--color-danger);
+    color: hsl(0 70% 20%);
+}
+
+ui-notification .notification-icon {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+ui-notification .notification-content {
+    flex: 1;
+}
+
+ui-notification .notification-message {
+    margin-bottom: var(--size-2);
+    line-height: 1.5;
+}
+
+ui-notification .notification-action {
+    display: inline-block;
+    padding: var(--size-1) var(--size-3);
+    background: currentColor;
+    color: white;
+    text-decoration: none;
+    border-radius: var(--radius-size);
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: opacity 0.2s var(--animation-smooth);
+}
+
+ui-notification .notification-action:hover {
+    opacity: 0.8;
+}
+
+ui-notification .notification-dismiss {
+    position: absolute;
+    top: var(--size-2);
+    right: var(--size-2);
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.2s var(--animation-smooth);
+    color: inherit;
+}
+
+ui-notification .notification-dismiss:hover {
+    opacity: 1;
+}
+
+ui-notification.dismissing {
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.3s var(--animation-smooth);
+}
+</style>
+
+<script>
+// Notification Component Initialization
+function initNotifications() {
+    document.querySelectorAll('ui-notification').forEach(notification => {
+        const type = notification.getAttribute('type');
+        const message = notification.getAttribute('message');
+        const dismissible = notification.getAttribute('dismissible') === 'true';
+        const action = notification.getAttribute('action');
+        const actionLink = notification.getAttribute('actionLink');
+        const theme = notification.getAttribute('theme') || 'primary';
+        
+        notification.classList.add(type, theme);
+        
+        const icons = {
+            info: 'ℹ️',
+            success: '✅',
+            warning: '⚠️',
+            error: '❌'
+        };
+        
+        let notificationHTML = `<div class="notification-icon">${icons[type] || icons.info}</div>`;
+        notificationHTML += '<div class="notification-content">';
+        notificationHTML += `<div class="notification-message">${message}</div>`;
+        
+        if (action) {
+            notificationHTML += `<a href="${actionLink || '#'}" class="notification-action">${action}</a>`;
+        }
+        
+        notificationHTML += '</div>';
+        
+        if (dismissible) {
+            notificationHTML += '<button class="notification-dismiss" onclick="this.closest(\'ui-notification\').dismiss()">×</button>';
+        }
+        
+        notification.innerHTML = notificationHTML;
+        
+        // Add dismiss method
+        notification.dismiss = function() {
+            this.classList.add('dismissing');
+            setTimeout(() => {
+                this.remove();
+            }, 300);
+        };
+    });
+}
+
+// Initialize notifications when DOM is loaded
+document.addEventListener('DOMContentLoaded', initNotifications);
+</script>

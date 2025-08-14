@@ -1,0 +1,2162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Component Builder</title>
+    <link rel="stylesheet" href="https://unpkg.com/chota@latest">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="components/component-styles.css">
+    <style>
+        @import "https://unpkg.com/open-props";
+        
+        :root {
+            --brand-hue: 25;
+            --radius-size: 1rem;
+            --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --color-primary: hsl(var(--brand-hue) 95% 60%);
+            --animation-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, hsl(var(--brand-hue) 20% 95%), hsl(calc(var(--brand-hue) + 60) 20% 95%));
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .builder-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            height: calc(100vh - 4rem);
+        }
+
+        .control-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-size);
+            padding: 2rem;
+            box-shadow: var(--shadow-soft);
+            overflow-y: auto;
+        }
+
+        .preview-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-size);
+            padding: 2rem;
+            box-shadow: var(--shadow-soft);
+            overflow-y: auto;
+        }
+
+        .component-selector {
+            margin-bottom: 2rem;
+        }
+
+        .component-selector select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            background: white;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            transition: border-color 0.3s var(--animation-smooth);
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .generate-btn {
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 0.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s var(--animation-smooth);
+            width: 100%;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .code-output {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            white-space: pre-wrap;
+            margin-top: 1rem;
+        }
+
+        .copy-btn {
+            background: #374151;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 0.25rem;
+            font-size: 0.875rem;
+            cursor: pointer;
+            margin-top: 0.5rem;
+        }
+
+        .preview-container {
+            min-height: 400px;
+            border: 2px dashed #d1d5db;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #6b7280;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .component-preview {
+            width: 100%;
+        }
+
+        /* Component styles are now loaded from component-styles.css */
+    </style>
+</head>
+<body>
+    <div class="builder-container">
+        <div class="control-panel">
+            <h1>🎨 Component Builder</h1>
+            <p>Create and customize UI components visually</p>
+            
+            <div class="component-selector">
+                <label for="componentType">Choose Component:</label>
+                <select id="componentType" onchange="showComponentForm()">
+                    <option value="">Select a component...</option>
+                    <option value="card">Card</option>
+                    <option value="table">Table</option>
+                    <option value="accordion">Accordion</option>
+                    <option value="carousel">Carousel</option>
+                    <option value="alert">Alert</option>
+                    <option value="badge">Badge</option>
+                    <option value="avatar">Avatar</option>
+                    <option value="chips">Chips</option>
+                    <option value="quiz">Quiz</option>
+                    <option value="keypoints">Keypoints</option>
+                    <option value="timeline">Timeline</option>
+                    <option value="resources">Resources</option>
+                    <option value="code-block">Code Block</option>
+                    <option value="suggestions">Suggestions</option>
+                    <option value="scrollytelling">Scrollytelling</option>
+                    <option value="lyric">Lyric</option>
+                    <option value="card-stack">Card Stack</option>
+                    <option value="spotlight">Spotlight</option>
+                    <option value="ticker">Ticker</option>
+                    <option value="notification">Notification</option>
+                    <option value="card-swiper">Card Swiper</option>
+                    <option value="calendar">Calendar</option>
+                                    <option value="media-player">Media Player</option>
+                <option value="enhanced-map">Enhanced Map</option>
+                <option value="map">Map</option>
+                <option value="dynamic-map">Dynamic Map</option>
+                <option value="list">List</option>
+                <option value="divider">Divider</option>
+                <option value="tabs">Tabs</option>
+                </select>
+            </div>
+
+            <!-- Card Form -->
+            <div id="cardForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="cardTitle">Title</label>
+                    <input type="text" id="cardTitle" placeholder="Enter card title" value="Product Card">
+                </div>
+                <div class="form-group">
+                    <label for="cardSubtitle">Subtitle</label>
+                    <input type="text" id="cardSubtitle" placeholder="Enter card subtitle" value="Card Subtitle">
+                </div>
+                <div class="form-group">
+                    <label for="cardImage">Image URL</label>
+                    <input type="url" id="cardImage" placeholder="https://example.com/image.jpg" value="https://picsum.photos/400/250">
+                </div>
+                <div class="form-group">
+                    <label for="cardContent">Content</label>
+                    <textarea id="cardContent" placeholder="Enter card content">This is a product description that showcases the component's features.</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="cardActionText">Action Button Text</label>
+                    <input type="text" id="cardActionText" placeholder="Read More" value="Learn More">
+                </div>
+                <div class="form-group">
+                    <label for="cardVariant">Variant</label>
+                    <select id="cardVariant">
+                        <option value="default">Default</option>
+                        <option value="elevated">Elevated</option>
+                        <option value="outlined">Outlined</option>
+                        <option value="minimal">Minimal</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="cardSize">Size</label>
+                    <select id="cardSize">
+                        <option value="small">Small</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="large">Large</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="cardDesignVariant">Design Variant</label>
+                    <select id="cardDesignVariant">
+                        <option value="default">Default</option>
+                        <option value="glassmorphism">GlassMorphism</option>
+                        <option value="neumorphism-soft">Neumorphism (Soft)</option>
+                        <option value="neumorphism-pressed">Neumorphism (Pressed)</option>
+                        <option value="claymorphism-clay">Claymorphism (Clay)</option>
+                        <option value="claymorphism-layered">Claymorphism (Layered)</option>
+                        <option value="brutalism-sharp">Brutalism (Sharp)</option>
+                        <option value="brutalism-pixel">Brutalism (Pixel)</option>
+                        <option value="aurora-vibrant">Aurora (Vibrant)</option>
+                        <option value="aurora-ethereal">Aurora (Ethereal)</option>
+                        <option value="minimal-ultra">Minimal (Ultra)</option>
+                        <option value="minimal-outline">Minimal (Outline)</option>
+                        <option value="cyberpunk-neon">Cyberpunk (Neon)</option>
+                        <option value="cyberpunk-glitch">Cyberpunk (Glitch)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Table Form -->
+            <div id="tableForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="tableHeaders">Headers (comma-separated)</label>
+                    <input type="text" id="tableHeaders" placeholder="Name, Email, Role, Status" value="Name,Email,Role,Status">
+                </div>
+                <div class="form-group">
+                    <label for="tableRows">Rows (semicolon-separated, comma-separated cells)</label>
+                    <textarea id="tableRows" placeholder="John Doe,john@company.com,Developer,Active;Jane Smith,jane@company.com,Designer,Active">John Doe,john@company.com,Developer,Active;Jane Smith,jane@company.com,Designer,Active;Bob Johnson,bob@company.com,Manager,Inactive</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="tableStriped">Striped Rows</label>
+                    <select id="tableStriped">
+                        <option value="true" selected>Yes</option>
+                        <option value="false">No</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Accordion Form -->
+            <div id="accordionForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="accordionItems">Items (JSON format)</label>
+                    <textarea id="accordionItems" placeholder='[{"title":"Section 1","content":"Content for section 1"},{"title":"Section 2","content":"Content for section 2"}]'>[{"title":"What is this component library?","content":"A modern UI component library built with Chota CSS and Open Props, featuring reusable components with multiple usage patterns."},{"title":"How do I get started?","content":"Check out the Quick Start Guide or try the Visual Builder to create components without writing code."},{"title":"Is it responsive?","content":"Yes! All components are fully responsive and work perfectly on desktop, tablet, and mobile devices."}]</textarea>
+                </div>
+            </div>
+
+            <!-- Alert Form -->
+            <div id="alertForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="alertType">Type</label>
+                    <select id="alertType">
+                        <option value="success" selected>Success</option>
+                        <option value="warning">Warning</option>
+                        <option value="error">Error</option>
+                        <option value="info">Info</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="alertMessage">Message</label>
+                    <textarea id="alertMessage" placeholder="Enter alert message">This is an alert message that provides important information to users.</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="alertDuration">Duration (ms)</label>
+                    <input type="number" id="alertDuration" value="5000" min="0">
+                </div>
+            </div>
+
+            <!-- Badge Form -->
+            <div id="badgeForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="badgeLabel">Label</label>
+                    <input type="text" id="badgeLabel" placeholder="New" value="New">
+                </div>
+                <div class="form-group">
+                    <label for="badgeColor">Color</label>
+                    <select id="badgeColor">
+                        <option value="primary" selected>Primary</option>
+                        <option value="success">Success</option>
+                        <option value="warning">Warning</option>
+                        <option value="danger">Danger</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="badgeDesignVariant">Design Variant</label>
+                    <select id="badgeDesignVariant">
+                        <option value="default">Default</option>
+                        <option value="glassmorphism">GlassMorphism</option>
+                        <option value="neumorphism-soft">Neumorphism (Soft)</option>
+                        <option value="neumorphism-pressed">Neumorphism (Pressed)</option>
+                        <option value="claymorphism-clay">Claymorphism (Clay)</option>
+                        <option value="claymorphism-layered">Claymorphism (Layered)</option>
+                        <option value="brutalism-sharp">Brutalism (Sharp)</option>
+                        <option value="brutalism-pixel">Brutalism (Pixel)</option>
+                        <option value="aurora-vibrant">Aurora (Vibrant)</option>
+                        <option value="aurora-ethereal">Aurora (Ethereal)</option>
+                        <option value="minimal-ultra">Minimal (Ultra)</option>
+                        <option value="minimal-outline">Minimal (Outline)</option>
+                        <option value="cyberpunk-neon">Cyberpunk (Neon)</option>
+                        <option value="cyberpunk-glitch">Cyberpunk (Glitch)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Avatar Form -->
+            <div id="avatarForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="avatarSrc">Image URL or Icon</label>
+                    <input type="text" id="avatarSrc" placeholder="https://example.com/avatar.jpg or 👤" value="👤">
+                </div>
+                <div class="form-group">
+                    <label for="avatarSize">Size</label>
+                    <select id="avatarSize">
+                        <option value="small">Small</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="large">Large</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Chips Form -->
+            <div id="chipsForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="chipsLabels">Labels (comma-separated)</label>
+                    <input type="text" id="chipsLabels" placeholder="React, Vue, Angular" value="React,Vue,Angular,TypeScript">
+                </div>
+                <div class="form-group">
+                    <label for="chipsColor">Color</label>
+                    <select id="chipsColor">
+                        <option value="primary" selected>Primary</option>
+                        <option value="secondary">Secondary</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Quiz Form -->
+            <div id="quizForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="quizQuestion">Question</label>
+                    <input type="text" id="quizQuestion" placeholder="Enter question" value="What is the most important aspect of web development?">
+                </div>
+                <div class="form-group">
+                    <label for="quizOptions">Options (JSON format)</label>
+                    <textarea id="quizOptions" placeholder='[{"text":"Option 1","isCorrect":false},{"text":"Option 2","isCorrect":true}]' rows="4">[{"text":"Design","isCorrect":false},{"text":"Performance","isCorrect":true},{"text":"Content","isCorrect":false},{"text":"SEO","isCorrect":false}]</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="quizTheme">Theme</label>
+                    <select id="quizTheme">
+                        <option value="primary" selected>Primary</option>
+                        <option value="secondary">Secondary</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Keypoints Form -->
+            <div id="keypointsForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="keypointsItems">Items (JSON format)</label>
+                    <textarea id="keypointsItems" placeholder='[{"text":"Key point 1"},{"text":"Key point 2"}]' rows="4">[{"text":"Retrieval grounding improves factuality"},{"text":"Use citations for verifiability"},{"text":"Prefer streaming markdown for long answers"}]</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="keypointsUpdatedAt">Updated At</label>
+                    <input type="text" id="keypointsUpdatedAt" placeholder="just now" value="just now">
+                </div>
+                <div class="form-group">
+                    <label for="keypointsConfidence">Confidence</label>
+                    <input type="number" id="keypointsConfidence" value="0.86" step="0.01" min="0" max="1">
+                </div>
+            </div>
+
+            <!-- Timeline Form -->
+            <div id="timelineForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="timelineItems">Items (JSON format)</label>
+                    <textarea id="timelineItems" placeholder='[{"title":"Step 1","detail":"Description","status":"done"}]' rows="4">[{"title":"Ingest question","detail":"Parse intent and constraints","status":"done"},{"title":"Plan","detail":"Generate outline and tools","status":"current"},{"title":"Answer","detail":"Stream markdown","status":"pending"}]</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="timelineCurrent">Current Step</label>
+                    <input type="number" id="timelineCurrent" value="1" min="0">
+                </div>
+            </div>
+
+            <!-- Resources Form -->
+            <div id="resourcesForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="resourcesItems">Resources (JSON format)</label>
+                    <textarea id="resourcesItems" placeholder='[{"title":"Title","description":"Description","url":"https://company.com"}]' rows="4">[{"title":"Documentation","description":"Official documentation","url":"https://company.com"},{"title":"Tutorial","description":"Step-by-step guide","url":"https://company.com/tutorial"}]</textarea>
+                </div>
+            </div>
+
+            <!-- Code Block Form -->
+            <div id="code-blockForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="codeBlockTitle">Title</label>
+                    <input type="text" id="codeBlockTitle" placeholder="Code Title" value="JavaScript Function">
+                </div>
+                <div class="form-group">
+                    <label for="codeBlockContent">Code</label>
+                    <textarea id="codeBlockContent" placeholder="Enter code" rows="6">function hello() {
+    console.log("Hello, World!");
+}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="codeBlockLanguage">Language</label>
+                    <input type="text" id="codeBlockLanguage" placeholder="javascript" value="javascript">
+                </div>
+            </div>
+
+            <!-- Citation Form -->
+            <div id="citationForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="citationText">Citation Text</label>
+                    <textarea id="citationText" placeholder="Enter citation text" rows="3">This is an important quote that needs to be cited properly.</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="citationSource">Source</label>
+                    <input type="text" id="citationSource" placeholder="Author Name, Publication Year" value="Author Name, Publication Year">
+                </div>
+            </div>
+
+            <!-- Suggestions Form -->
+            <div id="suggestionsForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="suggestionsItems">Suggestions (comma-separated)</label>
+                    <textarea id="suggestionsItems" placeholder="Suggestion 1, Suggestion 2" rows="3">Suggestion 1,Suggestion 2,Suggestion 3</textarea>
+                </div>
+            </div>
+
+            <!-- Scrollytelling Form -->
+            <div id="scrollytellingForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="scrollytellingSteps">Steps (JSON format)</label>
+                    <textarea id="scrollytellingSteps" placeholder='[{"title":"Step 1","content":"Content"}]' rows="4">[{"title":"Step 1","content":"First step content"},{"title":"Step 2","content":"Second step content"}]</textarea>
+                </div>
+            </div>
+
+            <!-- Lyric Form -->
+            <div id="lyricForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="lyricText">Lyric Text</label>
+                    <textarea id="lyricText" placeholder="Enter lyric text" rows="3">This is a beautiful lyric that speaks to the soul.</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="lyricAuthor">Author</label>
+                    <input type="text" id="lyricAuthor" placeholder="Unknown Artist" value="Unknown Artist">
+                </div>
+            </div>
+
+            <!-- Card Stack Form -->
+            <div id="card-stackForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="cardStackItems">Cards (JSON format)</label>
+                    <textarea id="cardStackItems" placeholder='[{"title":"Card 1","content":"Content"}]' rows="4">[{"title":"Card 1","content":"First card content"},{"title":"Card 2","content":"Second card content"}]</textarea>
+                </div>
+            </div>
+
+            <!-- Spotlight Form -->
+            <div id="spotlightForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="spotlightContent">Content</label>
+                    <textarea id="spotlightContent" placeholder="Enter content" rows="3">This content will be highlighted with a spotlight effect.</textarea>
+                </div>
+            </div>
+
+            <!-- Ticker Form -->
+            <div id="tickerForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="tickerItems">Items (comma-separated)</label>
+                    <textarea id="tickerItems" placeholder="Breaking News, Latest Updates" rows="3">Breaking News,Latest Updates,Important Announcement</textarea>
+                </div>
+            </div>
+
+            <!-- Notification Form -->
+            <div id="notificationForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="notificationType">Type</label>
+                    <select id="notificationType">
+                        <option value="success" selected>Success</option>
+                        <option value="error">Error</option>
+                        <option value="warning">Warning</option>
+                        <option value="info">Info</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="notificationTitle">Title</label>
+                    <input type="text" id="notificationTitle" placeholder="Notification Title" value="Notification Title">
+                </div>
+                <div class="form-group">
+                    <label for="notificationMessage">Message</label>
+                    <textarea id="notificationMessage" placeholder="Enter message" rows="2">This is a notification message.</textarea>
+                </div>
+            </div>
+
+            <!-- List Form -->
+            <div id="listForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="listItems">Items (comma-separated):</label>
+                    <input type="text" id="listItems" value="First item,Second item,Third item" class="form-control" placeholder="Enter items separated by commas">
+                </div>
+                <div class="form-group">
+                    <label for="listType">List Type:</label>
+                    <select id="listType" class="form-control">
+                        <option value="unordered">Unordered (Bullets)</option>
+                        <option value="ordered">Ordered (Numbers)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Divider Form -->
+            <div id="dividerForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="dividerLabel">Label (optional):</label>
+                    <input type="text" id="dividerLabel" value="Section Break" class="form-control" placeholder="Enter divider label">
+                </div>
+                <div class="form-group">
+                    <label for="dividerStyle">Style:</label>
+                    <select id="dividerStyle" class="form-control">
+                        <option value="solid">Solid</option>
+                        <option value="dashed">Dashed</option>
+                        <option value="dotted">Dotted</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Tabs Form -->
+            <div id="tabsForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="tabsData">Tabs Data (JSON):</label>
+                    <textarea id="tabsData" rows="4" class="form-control" placeholder='[{"title":"Tab 1","content":"Content for tab 1"},{"title":"Tab 2","content":"Content for tab 2"}]'>[{"title":"Tab 1","content":"Content for tab 1"},{"title":"Tab 2","content":"Content for tab 2"}]</textarea>
+                </div>
+            </div>
+
+            <!-- Map Form -->
+            <div id="mapForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="mapLatitude">Latitude:</label>
+                    <input type="number" id="mapLatitude" value="40.7128" step="0.0001">
+                </div>
+                <div class="form-group">
+                    <label for="mapLongitude">Longitude:</label>
+                    <input type="number" id="mapLongitude" value="-74.0060" step="0.0001">
+                </div>
+                <div class="form-group">
+                    <label for="mapZoom">Zoom Level:</label>
+                    <input type="number" id="mapZoom" value="10" min="1" max="20">
+                </div>
+            </div>
+
+            <!-- Dynamic Map Form -->
+            <div id="dynamic-mapForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="dynamicMapLatitude">Latitude:</label>
+                    <input type="number" id="dynamicMapLatitude" value="40.7128" step="0.0001">
+                </div>
+                <div class="form-group">
+                    <label for="dynamicMapLongitude">Longitude:</label>
+                    <input type="number" id="dynamicMapLongitude" value="-74.0060" step="0.0001">
+                </div>
+                <div class="form-group">
+                    <label for="dynamicMapZoom">Zoom Level:</label>
+                    <input type="number" id="dynamicMapZoom" value="10" min="1" max="20">
+                </div>
+            </div>
+
+            <!-- Enhanced Map Form -->
+            <div id="enhanced-mapForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="mapLatitude">Latitude</label>
+                    <input type="number" id="mapLatitude" value="40.7128" step="0.0001">
+                </div>
+                <div class="form-group">
+                    <label for="mapLongitude">Longitude</label>
+                    <input type="number" id="mapLongitude" value="-74.0060" step="0.0001">
+                </div>
+                <div class="form-group">
+                    <label for="mapZoom">Zoom Level</label>
+                    <input type="number" id="mapZoom" value="10" min="1" max="18">
+                </div>
+            </div>
+
+            <!-- Card Swiper Form -->
+            <div id="card-swiperForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="swiperCards">Cards (JSON)</label>
+                    <textarea id="swiperCards" rows="6" placeholder="Enter cards as JSON array">[{"id":"1","title":"Coffee Shop","subtitle":"Artisan Coffee","image":"https://picsum.photos/400/600?random=1","description":"Best coffee in town","rating":"4.8","tags":"Coffee,Atmosphere,WiFi"},{"id":"2","title":"Tech Conference","subtitle":"Innovation Summit","image":"https://picsum.photos/400/600?random=2","description":"Join the biggest tech event","rating":"4.9","tags":"Technology,Networking,Learning"}]</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="swiperShowActions">Show Action Buttons</label>
+                    <input type="checkbox" id="swiperShowActions" checked>
+                </div>
+                <div class="form-group">
+                    <label for="swiperAutoSwipe">Auto Swipe</label>
+                    <input type="checkbox" id="swiperAutoSwipe">
+                </div>
+                <div class="form-group">
+                    <label for="swiperThreshold">Swipe Threshold</label>
+                    <input type="number" id="swiperThreshold" value="100" min="50" max="200">
+                </div>
+            </div>
+
+            <!-- Calendar Form -->
+            <div id="calendarForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="calendarEvents">Events (JSON)</label>
+                    <textarea id="calendarEvents" rows="6" placeholder="Enter events as JSON array">[{"id":"1","title":"Team Meeting","date":"2024-01-15","time":"10:00","duration":"60","type":"meeting","color":"primary"},{"id":"2","title":"Project Deadline","date":"2024-01-20","time":"17:00","duration":"0","type":"deadline","color":"danger"}]</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="calendarView">View</label>
+                    <select id="calendarView">
+                        <option value="month" selected>Month</option>
+                        <option value="week">Week</option>
+                        <option value="day">Day</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="calendarSelectable">Selectable</label>
+                    <input type="checkbox" id="calendarSelectable" checked>
+                </div>
+                <div class="form-group">
+                    <label for="calendarMultiSelect">Multi Select</label>
+                    <input type="checkbox" id="calendarMultiSelect">
+                </div>
+                <div class="form-group">
+                    <label for="calendarFirstDay">First Day</label>
+                    <select id="calendarFirstDay">
+                        <option value="monday" selected>Monday</option>
+                        <option value="sunday">Sunday</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Media Player Form -->
+            <div id="media-playerForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="mediaType">Type</label>
+                    <select id="mediaType">
+                        <option value="video" selected>Video</option>
+                        <option value="audio">Audio</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="mediaSrc">Source URL</label>
+                    <input type="url" id="mediaSrc" placeholder="https://example.com/video.mp4" value="https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4">
+                </div>
+                <div class="form-group">
+                    <label for="mediaPoster">Poster Image</label>
+                    <input type="url" id="mediaPoster" placeholder="https://example.com/poster.jpg" value="https://picsum.photos/800/450?random=1">
+                </div>
+                <div class="form-group">
+                    <label for="mediaTitle">Title</label>
+                    <input type="text" id="mediaTitle" placeholder="Media Title" value="Product Video">
+                </div>
+                <div class="form-group">
+                    <label for="mediaDescription">Description</label>
+                    <textarea id="mediaDescription" rows="2" placeholder="Media description">A product video showcasing features and benefits</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="mediaPlaylist">Playlist (JSON)</label>
+                    <textarea id="mediaPlaylist" rows="4" placeholder="Enter playlist as JSON array">[{"id":"1","title":"Sample Video 1","src":"https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_1mb.mp4","poster":"https://picsum.photos/800/450?random=1","duration":"00:01:15"},{"id":"2","title":"Sample Video 2","src":"https://sample-videos.com/zip/10/mp4/SampleVideo_1280x720_2mb.mp4","poster":"https://picsum.photos/800/450?random=2","duration":"00:02:30"}]</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="mediaShowPlaylist">Show Playlist</label>
+                    <input type="checkbox" id="mediaShowPlaylist" checked>
+                </div>
+                <div class="form-group">
+                    <label for="mediaAutoplay">Autoplay</label>
+                    <input type="checkbox" id="mediaAutoplay">
+                </div>
+                <div class="form-group">
+                    <label for="mediaLoop">Loop</label>
+                    <input type="checkbox" id="mediaLoop">
+                </div>
+            </div>
+
+            <!-- Lyric Form -->
+            <div id="lyricForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="lyricText">Text</label>
+                    <textarea id="lyricText" rows="4" placeholder="Enter text to stream">These are streamed words that highlight one-by-one for better focus.</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="lyricMode">Mode</label>
+                    <select id="lyricMode">
+                        <option value="word" selected>Word</option>
+                        <option value="line">Line</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="lyricCursor">Show Cursor</label>
+                    <input type="checkbox" id="lyricCursor" checked>
+                </div>
+                <div class="form-group">
+                    <label for="lyricSpeed">Speed (ms)</label>
+                    <input type="number" id="lyricSpeed" value="200" min="100" max="1000" step="50">
+                </div>
+            </div>
+
+            <!-- Spotlight Form -->
+            <div id="spotlightForm" class="component-form hidden">
+                <div class="form-group">
+                    <label for="spotlightSections">Sections (JSON)</label>
+                    <textarea id="spotlightSections" rows="6" placeholder="Enter sections as JSON array">[{"title":"Problem","text":"Describe the problem succinctly."},{"title":"Approach","text":"Lay out a step-by-step plan."},{"title":"Answer","text":"Deliver the final result with citations."}]</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="spotlightActiveIndex">Active Index</label>
+                    <input type="number" id="spotlightActiveIndex" value="0" min="0" max="10">
+                </div>
+            </div>
+
+            <button class="generate-btn" onclick="generateComponent()">Generate Component</button>
+        </div>
+
+        <div class="preview-panel">
+            <h2>Preview & Code</h2>
+            <div id="previewContainer" class="preview-container">
+                <p>Select a component to see the preview and generated code</p>
+            </div>
+            <div id="codeOutput" class="code-output hidden"></div>
+            <button id="copyBtn" class="copy-btn hidden" onclick="copyCode()">Copy Code</button>
+        </div>
+    </div>
+
+    <script>
+        function showComponentForm() {
+            const componentType = document.getElementById('componentType').value;
+            const forms = document.querySelectorAll('.component-form');
+            
+            forms.forEach(form => form.classList.add('hidden'));
+            
+            if (componentType) {
+                const form = document.getElementById(componentType + 'Form');
+                if (form) {
+                    form.classList.remove('hidden');
+                }
+            }
+        }
+
+        function generateComponent() {
+            const componentType = document.getElementById('componentType').value;
+            if (!componentType) return;
+
+            let html = '';
+            let attributes = '';
+
+            switch (componentType) {
+                case 'card':
+                    attributes = generateCardAttributes();
+                    html = generateCardHTML();
+                    break;
+                case 'table':
+                    attributes = generateTableAttributes();
+                    html = generateTableHTML();
+                    break;
+                case 'accordion':
+                    attributes = generateAccordionAttributes();
+                    html = generateAccordionHTML();
+                    break;
+                case 'alert':
+                    attributes = generateAlertAttributes();
+                    html = generateAlertHTML();
+                    break;
+                case 'badge':
+                    attributes = generateBadgeAttributes();
+                    html = generateBadgeHTML();
+                    break;
+                case 'avatar':
+                    attributes = generateAvatarAttributes();
+                    html = generateAvatarHTML();
+                    break;
+                case 'chips':
+                    attributes = generateChipsAttributes();
+                    html = generateChipsHTML();
+                    break;
+                case 'quiz':
+                    attributes = generateQuizAttributes();
+                    html = generateQuizHTML();
+                    break;
+                case 'keypoints':
+                    attributes = generateKeypointsAttributes();
+                    html = generateKeypointsHTML();
+                    break;
+                case 'timeline':
+                    attributes = generateTimelineAttributes();
+                    html = generateTimelineHTML();
+                    break;
+                case 'resources':
+                    attributes = generateResourcesAttributes();
+                    html = generateResourcesHTML();
+                    break;
+                case 'code-block':
+                    attributes = generateCodeBlockAttributes();
+                    html = generateCodeBlockHTML();
+                    break;
+                case 'suggestions':
+                    attributes = generateSuggestionsAttributes();
+                    html = generateSuggestionsHTML();
+                    break;
+                case 'scrollytelling':
+                    attributes = generateScrollytellingAttributes();
+                    html = generateScrollytellingHTML();
+                    break;
+                case 'lyric':
+                    attributes = generateLyricAttributes();
+                    html = generateLyricHTML();
+                    break;
+                case 'card-stack':
+                    attributes = generateCardStackAttributes();
+                    html = generateCardStackHTML();
+                    break;
+                case 'spotlight':
+                    attributes = generateSpotlightAttributes();
+                    html = generateSpotlightHTML();
+                    break;
+                case 'ticker':
+                    attributes = generateTickerAttributes();
+                    html = generateTickerHTML();
+                    break;
+                case 'notification':
+                    attributes = generateNotificationAttributes();
+                    html = generateNotificationHTML();
+                    break;
+                case 'enhanced-map':
+                    attributes = generateEnhancedMapAttributes();
+                    html = generateEnhancedMapHTML();
+                    break;
+                case 'map':
+                    attributes = generateMapAttributes();
+                    html = generateMapHTML();
+                    break;
+                case 'dynamic-map':
+                    attributes = generateDynamicMapAttributes();
+                    html = generateDynamicMapHTML();
+                    break;
+                case 'list':
+                    attributes = generateListAttributes();
+                    html = generateListHTML();
+                    break;
+                case 'divider':
+                    attributes = generateDividerAttributes();
+                    html = generateDividerHTML();
+                    break;
+                case 'tabs':
+                    attributes = generateTabsAttributes();
+                    html = generateTabsHTML();
+                    break;
+                case 'carousel':
+                    attributes = generateCarouselAttributes();
+                    html = generateCarouselHTML();
+                    break;
+                case 'card-swiper':
+                    attributes = generateCardSwiperAttributes();
+                    html = generateCardSwiperHTML();
+                    break;
+                case 'calendar':
+                    attributes = generateCalendarAttributes();
+                    html = generateCalendarHTML();
+                    break;
+                case 'media-player':
+                    attributes = generateMediaPlayerAttributes();
+                    html = generateMediaPlayerHTML();
+                    break;
+            }
+
+            // Update preview
+            const previewContainer = document.getElementById('previewContainer');
+            previewContainer.innerHTML = `<div class="component-preview">${html}</div>`;
+            
+            // Show code output
+            const codeOutput = document.getElementById('codeOutput');
+            codeOutput.textContent = `<ui-${componentType} ${attributes}></ui-${componentType}>`;
+            codeOutput.classList.remove('hidden');
+            
+            // Show copy button
+            document.getElementById('copyBtn').classList.remove('hidden');
+        }
+
+        function generateCardAttributes() {
+            const title = document.getElementById('cardTitle').value;
+            const subtitle = document.getElementById('cardSubtitle').value;
+            const image = document.getElementById('cardImage').value;
+            const content = document.getElementById('cardContent').value;
+            const actionText = document.getElementById('cardActionText').value;
+            const variant = document.getElementById('cardVariant').value;
+            const size = document.getElementById('cardSize').value;
+            const designVariant = document.getElementById('cardDesignVariant').value;
+
+            let attrs = [];
+            if (title) attrs.push(`title="${title}"`);
+            if (subtitle) attrs.push(`subtitle="${subtitle}"`);
+            if (image) attrs.push(`image="${image}"`);
+            if (content) attrs.push(`content="${content}"`);
+            if (actionText) attrs.push(`actionText="${actionText}"`);
+            if (variant) attrs.push(`variant="${variant}"`);
+            if (size) attrs.push(`size="${size}"`);
+            if (designVariant && designVariant !== 'default') attrs.push(`designVariant="${designVariant}"`);
+
+            return attrs.join(' ');
+        }
+
+        function generateCardHTML() {
+            const title = document.getElementById('cardTitle').value;
+            const subtitle = document.getElementById('cardSubtitle').value;
+            const image = document.getElementById('cardImage').value;
+            const content = document.getElementById('cardContent').value;
+            const actionText = document.getElementById('cardActionText').value;
+            const designVariant = document.getElementById('cardDesignVariant').value;
+
+            return `
+                <ui-card class="${designVariant !== 'default' ? designVariant : ''}">
+                    ${image ? `<img src="${image}" alt="${title}" class="card-image">` : ''}
+                    <div class="card-content">
+                        <span class="card-badge">New</span>
+                        <h3 class="card-title">${title}</h3>
+                        ${subtitle ? `<p class="card-subtitle">${subtitle}</p>` : ''}
+                        <p class="card-text">${content}</p>
+                        ${actionText ? `<a href="#" class="card-action">${actionText}</a>` : ''}
+                    </div>
+                </ui-card>
+            `;
+        }
+
+        function generateTableAttributes() {
+            const headers = document.getElementById('tableHeaders').value;
+            const rows = document.getElementById('tableRows').value;
+            const striped = document.getElementById('tableStriped').value;
+
+            let attrs = [];
+            if (headers) attrs.push(`headers="${headers}"`);
+            if (rows) attrs.push(`rows="${rows}"`);
+            if (striped) attrs.push(`striped="${striped}"`);
+
+            return attrs.join(' ');
+        }
+
+        function generateTableHTML() {
+            const headers = document.getElementById('tableHeaders').value;
+            const rows = document.getElementById('tableRows').value;
+            const striped = document.getElementById('tableStriped').value;
+
+            const headerArray = headers.split(',').map(h => h.trim());
+            const rowArray = rows.split(';').map(row => row.split(',').map(cell => cell.trim()));
+
+            let tableHTML = '<ui-table>';
+            tableHTML += '<table class="' + (striped === 'true' ? 'table-striped' : '') + '">';
+
+            if (headerArray.length > 0) {
+                tableHTML += '<thead><tr>';
+                headerArray.forEach(header => {
+                    tableHTML += `<th>${header}</th>`;
+                });
+                tableHTML += '</tr></thead>';
+            }
+
+            if (rowArray.length > 0) {
+                tableHTML += '<tbody>';
+                rowArray.forEach(row => {
+                    tableHTML += '<tr>';
+                    row.forEach(cell => {
+                        tableHTML += `<td>${cell}</td>`;
+                    });
+                    tableHTML += '</tr>';
+                });
+                tableHTML += '</tbody>';
+            }
+
+            tableHTML += '</table></ui-table>';
+            return tableHTML;
+        }
+
+        function generateAccordionAttributes() {
+            const items = document.getElementById('accordionItems').value;
+            if (items) {
+                return `items='${items}'`;
+            }
+            return '';
+        }
+
+        function generateAccordionHTML() {
+            const items = JSON.parse(document.getElementById('accordionItems').value || '[]');
+
+            let accordionHTML = '<ui-accordion><div class="accordion">';
+            items.forEach((item, index) => {
+                accordionHTML += `
+                    <div class="accordion-item">
+                        <div class="accordion-header" onclick="this.nextElementSibling.classList.toggle('active')">
+                            ${item.title}
+                        </div>
+                        <div class="accordion-content ${index === 0 ? 'active' : ''}">
+                            ${item.content}
+                        </div>
+                    </div>
+                `;
+            });
+            accordionHTML += '</div></ui-accordion>';
+            
+            return accordionHTML;
+        }
+
+        function generateAlertAttributes() {
+            const type = document.getElementById('alertType').value;
+            const message = document.getElementById('alertMessage').value;
+            const duration = document.getElementById('alertDuration').value;
+
+            let attrs = [];
+            if (type) attrs.push(`type="${type}"`);
+            if (message) attrs.push(`message="${message}"`);
+            if (duration) attrs.push(`duration="${duration}"`);
+
+            return attrs.join(' ');
+        }
+
+        function generateAlertHTML() {
+            const type = document.getElementById('alertType').value;
+            const message = document.getElementById('alertMessage').value;
+
+            return `
+                <ui-alert class="alert-${type}">
+                    <span class="alert-message">${message}</span>
+                    <button class="alert-close" onclick="this.parentElement.remove()">×</button>
+                </ui-alert>
+            `;
+        }
+
+        function generateBadgeAttributes() {
+            const label = document.getElementById('badgeLabel').value;
+            const color = document.getElementById('badgeColor').value;
+            const designVariant = document.getElementById('badgeDesignVariant').value;
+
+            let attrs = [];
+            if (label) attrs.push(`label="${label}"`);
+            if (color) attrs.push(`color="${color}"`);
+            if (designVariant && designVariant !== 'default') attrs.push(`designVariant="${designVariant}"`);
+
+            return attrs.join(' ');
+        }
+
+        function generateBadgeHTML() {
+            const label = document.getElementById('badgeLabel').value;
+            const color = document.getElementById('badgeColor').value;
+            const designVariant = document.getElementById('badgeDesignVariant').value;
+
+            return `<ui-badge class="badge-${color} ${designVariant !== 'default' ? designVariant : ''}">${label}</ui-badge>`;
+        }
+
+        function generateAvatarAttributes() {
+            const src = document.getElementById('avatarSrc').value;
+            const size = document.getElementById('avatarSize').value;
+
+            let attrs = [];
+            if (src) attrs.push(`src="${src}"`);
+            if (size) attrs.push(`size="${size}"`);
+
+            return attrs.join(' ');
+        }
+
+        function generateAvatarHTML() {
+            const src = document.getElementById('avatarSrc').value;
+
+            return `<ui-avatar>${src}</ui-avatar>`;
+        }
+
+        function generateChipsAttributes() {
+            const labels = document.getElementById('chipsLabels').value;
+            const color = document.getElementById('chipsColor').value;
+
+            let attrs = [];
+            if (labels) attrs.push(`labels="${labels}"`);
+            if (color) attrs.push(`color="${color}"`);
+
+            return attrs.join(' ');
+        }
+
+        function generateChipsHTML() {
+            const labels = document.getElementById('chipsLabels').value;
+            const color = document.getElementById('chipsColor').value;
+
+            const labelArray = labels.split(',').map(l => l.trim());
+            
+            return `
+                <ui-chips>
+                    <div class="chips">
+                        ${labelArray.map(label => `<span class="chip">${label}</span>`).join('')}
+                    </div>
+                </ui-chips>
+            `;
+        }
+
+        function copyCode() {
+            const codeOutput = document.getElementById('codeOutput');
+            navigator.clipboard.writeText(codeOutput.textContent).then(() => {
+                const copyBtn = document.getElementById('copyBtn');
+                copyBtn.textContent = 'Copied!';
+                setTimeout(() => {
+                    copyBtn.textContent = 'Copy Code';
+                }, 2000);
+            });
+        }
+
+        // Additional form generation functions for new components
+        function generateQuizForm() {
+            return `
+                <div class="form-group">
+                    <label for="quizQuestion">Question:</label>
+                    <input type="text" id="quizQuestion" value="What is the most important aspect of web development?" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="quizOptions">Options (JSON):</label>
+                    <textarea id="quizOptions" class="form-control" rows="4">[{"text":"Design","isCorrect":false},{"text":"Performance","isCorrect":true},{"text":"Content","isCorrect":false},{"text":"SEO","isCorrect":false}]</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="quizTheme">Theme:</label>
+                    <select id="quizTheme" class="form-control">
+                        <option value="primary">Primary</option>
+                        <option value="secondary">Secondary</option>
+                    </select>
+                </div>
+            `;
+        }
+
+        function generateKeypointsForm() {
+            return `
+                <div class="form-group">
+                    <label for="keypointsItems">Items (JSON):</label>
+                    <textarea id="keypointsItems" class="form-control" rows="4">[{"text":"Retrieval grounding improves factuality"},{"text":"Use citations for verifiability"},{"text":"Prefer streaming markdown for long answers"}]</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="keypointsUpdatedAt">Updated At:</label>
+                    <input type="text" id="keypointsUpdatedAt" value="just now" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="keypointsConfidence">Confidence:</label>
+                    <input type="number" id="keypointsConfidence" value="0.86" step="0.01" min="0" max="1" class="form-control">
+                </div>
+            `;
+        }
+
+        function generateTimelineForm() {
+            return `
+                <div class="form-group">
+                    <label for="timelineItems">Items (JSON):</label>
+                    <textarea id="timelineItems" class="form-control" rows="4">[{"title":"Ingest question","detail":"Parse intent and constraints","status":"done"},{"title":"Plan","detail":"Generate outline and tools","status":"current"},{"title":"Answer","detail":"Stream markdown","status":"pending"}]</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="timelineCurrent">Current Step:</label>
+                    <input type="number" id="timelineCurrent" value="1" min="0" class="form-control">
+                </div>
+            `;
+        }
+
+        function generateResourcesForm() {
+            return `
+                <div class="form-group">
+                    <label for="resourcesItems">Resources (JSON):</label>
+                    <textarea id="resourcesItems" class="form-control" rows="4">[{"title":"Documentation","description":"Official documentation","url":"https://example.com"},{"title":"Tutorial","description":"Step-by-step guide","url":"https://example.com/tutorial"}]</textarea>
+                </div>
+            `;
+        }
+
+        function generateCodeBlockForm() {
+            return `
+                <div class="form-group">
+                    <label for="codeBlockTitle">Title:</label>
+                    <input type="text" id="codeBlockTitle" value="Example Code" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="codeBlockContent">Code:</label>
+                    <textarea id="codeBlockContent" class="form-control" rows="6">function hello() {
+    console.log("Hello, World!");
+}</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="codeBlockLanguage">Language:</label>
+                    <input type="text" id="codeBlockLanguage" value="javascript" class="form-control">
+                </div>
+            `;
+        }
+
+
+
+        function generateSuggestionsForm() {
+            return `
+                <div class="form-group">
+                    <label for="suggestionsItems">Suggestions (comma-separated):</label>
+                    <textarea id="suggestionsItems" class="form-control" rows="3">Suggestion 1,Suggestion 2,Suggestion 3</textarea>
+                </div>
+            `;
+        }
+
+        function generateScrollytellingForm() {
+            return `
+                <div class="form-group">
+                    <label for="scrollytellingSteps">Steps (JSON):</label>
+                    <textarea id="scrollytellingSteps" class="form-control" rows="4">[{"title":"Step 1","content":"First step content"},{"title":"Step 2","content":"Second step content"}]</textarea>
+                </div>
+            `;
+        }
+
+        function generateLyricForm() {
+            return `
+                <div class="form-group">
+                    <label for="lyricText">Lyric Text:</label>
+                    <textarea id="lyricText" class="form-control" rows="3">This is a beautiful lyric that speaks to the soul.</textarea>
+                </div>
+                <div class="form-group">
+                    <label for="lyricAuthor">Author:</label>
+                    <input type="text" id="lyricAuthor" value="Unknown Artist" class="form-control">
+                </div>
+            `;
+        }
+
+        function generateCardStackForm() {
+            return `
+                <div class="form-group">
+                    <label for="cardStackItems">Cards (JSON):</label>
+                    <textarea id="cardStackItems" class="form-control" rows="4">[{"title":"Card 1","content":"First card content"},{"title":"Card 2","content":"Second card content"}]</textarea>
+                </div>
+            `;
+        }
+
+        function generateSpotlightForm() {
+            return `
+                <div class="form-group">
+                    <label for="spotlightContent">Content:</label>
+                    <textarea id="spotlightContent" class="form-control" rows="3">This content will be highlighted with a spotlight effect.</textarea>
+                </div>
+            `;
+        }
+
+        function generateTickerForm() {
+            return `
+                <div class="form-group">
+                    <label for="tickerItems">Items (comma-separated):</label>
+                    <textarea id="tickerItems" class="form-control" rows="3">Breaking News,Latest Updates,Important Announcement</textarea>
+                </div>
+            `;
+        }
+
+        function generateNotificationForm() {
+            return `
+                <div class="form-group">
+                    <label for="notificationType">Type:</label>
+                    <select id="notificationType" class="form-control">
+                        <option value="success">Success</option>
+                        <option value="error">Error</option>
+                        <option value="warning">Warning</option>
+                        <option value="info">Info</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="notificationTitle">Title:</label>
+                    <input type="text" id="notificationTitle" value="Notification Title" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="notificationMessage">Message:</label>
+                    <textarea id="notificationMessage" class="form-control" rows="2">This is a notification message.</textarea>
+                </div>
+            `;
+        }
+
+        function generateEnhancedMapForm() {
+            return `
+                <div class="form-group">
+                    <label for="mapLatitude">Latitude:</label>
+                    <input type="number" id="mapLatitude" value="40.7128" step="0.0001" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="mapLongitude">Longitude:</label>
+                    <input type="number" id="mapLongitude" value="-74.0060" step="0.0001" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="mapZoom">Zoom Level:</label>
+                    <input type="number" id="mapZoom" value="10" min="1" max="18" class="form-control">
+                </div>
+            `;
+        }
+
+        function generateMapForm() {
+            return `
+                <div class="form-group">
+                    <label for="mapLatitude">Latitude:</label>
+                    <input type="number" id="mapLatitude" value="40.7128" step="0.0001" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="mapLongitude">Longitude:</label>
+                    <input type="number" id="mapLongitude" value="-74.0060" step="0.0001" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="mapZoom">Zoom Level:</label>
+                    <input type="number" id="mapZoom" value="10" min="1" max="18" class="form-control">
+                </div>
+            `;
+        }
+
+        function generateDynamicMapForm() {
+            return `
+                <div class="form-group">
+                    <label for="dynamicMapLatitude">Latitude:</label>
+                    <input type="number" id="dynamicMapLatitude" value="40.7128" step="0.0001" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="dynamicMapLongitude">Longitude:</label>
+                    <input type="number" id="dynamicMapLongitude" value="-74.0060" step="0.0001" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="dynamicMapZoom">Zoom Level:</label>
+                    <input type="number" id="dynamicMapZoom" value="10" min="1" max="18" class="form-control">
+                </div>
+            `;
+        }
+
+        function generateListForm() {
+            return `
+                <div class="form-group">
+                    <label for="listItems">Items (comma-separated):</label>
+                    <input type="text" id="listItems" value="First item,Second item,Third item" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="listType">List Type:</label>
+                    <select id="listType" class="form-control">
+                        <option value="unordered">Unordered (Bullets)</option>
+                        <option value="ordered">Ordered (Numbers)</option>
+                    </select>
+                </div>
+            `;
+        }
+
+        function generateDividerForm() {
+            return `
+                <div class="form-group">
+                    <label for="dividerLabel">Label (optional):</label>
+                    <input type="text" id="dividerLabel" value="Section Break" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="dividerStyle">Style:</label>
+                    <select id="dividerStyle" class="form-control">
+                        <option value="solid">Solid</option>
+                        <option value="dashed">Dashed</option>
+                        <option value="dotted">Dotted</option>
+                    </select>
+                </div>
+            `;
+        }
+
+        function generateTabsForm() {
+            return `
+                <div class="form-group">
+                    <label for="tabsData">Tabs Data (JSON):</label>
+                    <textarea id="tabsData" rows="4" class="form-control" placeholder='[{"title":"Tab 1","content":"Content for tab 1"},{"title":"Tab 2","content":"Content for tab 2"}]'>[{"title":"Tab 1","content":"Content for tab 1"},{"title":"Tab 2","content":"Content for tab 2"}]</textarea>
+                </div>
+            `;
+        }
+
+        function generateCarouselForm() {
+            return `
+                <div class="form-group">
+                    <label for="carouselImages">Images (comma-separated URLs):</label>
+                    <input type="text" id="carouselImages" value="https://picsum.photos/400/200?random=1,https://picsum.photos/400/200?random=2" class="form-control">
+                </div>
+                <div class="form-group">
+                    <label for="carouselInterval">Auto-rotate Interval (ms):</label>
+                    <input type="number" id="carouselInterval" value="3000" min="1000" step="500" class="form-control">
+                </div>
+            `;
+        }
+
+        // Attribute and HTML generation functions for new components
+        function generateQuizAttributes() {
+            const question = document.getElementById('quizQuestion').value;
+            const options = document.getElementById('quizOptions').value;
+            const theme = document.getElementById('quizTheme').value;
+
+            let attrs = [];
+            if (question) attrs.push(`question="${question}"`);
+            if (options) attrs.push(`options='${options}'`);
+            if (theme) attrs.push(`theme="${theme}"`);
+
+            return attrs.join(' ');
+        }
+
+        function generateQuizHTML() {
+            const question = document.getElementById('quizQuestion').value;
+            const options = JSON.parse(document.getElementById('quizOptions').value || '[]');
+            const theme = document.getElementById('quizTheme').value;
+
+            let html = `<ui-quiz class="${theme}">`;
+            html += `<div class="quiz-question">${question}</div>`;
+            html += '<div class="quiz-options">';
+            options.forEach(option => {
+                html += `<div class="quiz-option">${option.text}</div>`;
+            });
+            html += '</div></ui-quiz>';
+            
+            return html;
+        }
+
+        function generateKeypointsAttributes() {
+            const items = document.getElementById('keypointsItems').value;
+            const updatedAt = document.getElementById('keypointsUpdatedAt').value;
+            const confidence = document.getElementById('keypointsConfidence').value;
+
+            let attrs = [];
+            if (items) attrs.push(`items='${items}'`);
+            if (updatedAt) attrs.push(`updatedAt="${updatedAt}"`);
+            if (confidence) attrs.push(`confidence="${confidence}"`);
+
+            return attrs.join(' ');
+        }
+
+        function generateKeypointsHTML() {
+            const items = JSON.parse(document.getElementById('keypointsItems').value || '[]');
+            const updatedAt = document.getElementById('keypointsUpdatedAt').value;
+            const confidence = document.getElementById('keypointsConfidence').value;
+
+            let html = '<ui-keypoints>';
+            if (confidence || updatedAt) {
+                html += '<div class="kp-header">';
+                if (confidence) html += `<span class="kp-badge">confidence: ${(Number(confidence)*100).toFixed(0)}%</span>`;
+                if (updatedAt) html += `<span class="kp-badge">updated ${updatedAt}</span>`;
+                html += '</div>';
+            }
+            html += '<div class="kp-list">';
+            items.forEach(item => {
+                html += `<div class="kp-item"><div class="kp-dot"></div><div class="kp-text">${item.text}</div></div>`;
+            });
+            html += '</div></ui-keypoints>';
+            
+            return html;
+        }
+
+        function generateTimelineAttributes() {
+            const items = document.getElementById('timelineItems').value;
+            const current = document.getElementById('timelineCurrent').value;
+
+            let attrs = [];
+            if (items) attrs.push(`items='${items}'`);
+            if (current) attrs.push(`current="${current}"`);
+
+            return attrs.join(' ');
+        }
+
+        function generateTimelineHTML() {
+            const items = JSON.parse(document.getElementById('timelineItems').value || '[]');
+            const current = parseInt(document.getElementById('timelineCurrent').value || '0');
+
+            let html = '<ui-timeline><div class="tl"><div class="line"></div>';
+            items.forEach((item, idx) => {
+                const status = item.status || (idx < current ? 'done' : idx === current ? 'current' : 'pending');
+                html += `<div class="row"><div class="dot ${status}"></div><div class="content"><div class="title">${item.title}</div><div class="detail">${item.detail}</div></div></div>`;
+            });
+            html += '</div></ui-timeline>';
+            
+            return html;
+        }
+
+        function generateResourcesAttributes() {
+            const items = document.getElementById('resourcesItems').value;
+            if (items) {
+                return `items='${items}'`;
+            }
+            return '';
+        }
+
+        function generateResourcesHTML() {
+            const items = JSON.parse(document.getElementById('resourcesItems').value || '[]');
+
+            let html = '<ui-resources><div class="resources-grid">';
+            items.forEach(item => {
+                html += `<div class="resource-item">
+                    <div class="resource-title">${item.title}</div>
+                    <div class="resource-description">${item.description}</div>
+                    <a href="${item.url}" class="resource-link">Learn More</a>
+                </div>`;
+            });
+            html += '</div></ui-resources>';
+            
+            return html;
+        }
+
+        function generateCodeBlockAttributes() {
+            const title = document.getElementById('codeBlockTitle').value;
+            const content = document.getElementById('codeBlockContent').value;
+            const language = document.getElementById('codeBlockLanguage').value;
+
+            let attrs = [];
+            if (title) attrs.push(`title="${title}"`);
+            if (content) attrs.push(`content="${content}"`);
+            if (language) attrs.push(`language="${language}"`);
+
+            return attrs.join(' ');
+        }
+
+        function generateCodeBlockHTML() {
+            const title = document.getElementById('codeBlockTitle').value;
+            const content = document.getElementById('codeBlockContent').value;
+            const language = document.getElementById('codeBlockLanguage').value;
+
+            let html = '<ui-code-block><div class="code-container">';
+            html += `<div class="code-header"><div class="code-title">${title}</div><div class="code-actions"><button class="code-action">Copy</button></div></div>`;
+            html += `<div class="code-content">${content}</div>`;
+            html += '</div></ui-code-block>';
+            
+            return html;
+        }
+
+
+
+
+
+        function generateSuggestionsAttributes() {
+            const items = document.getElementById('suggestionsItems').value;
+            if (items) {
+                return `items="${items}"`;
+            }
+            return '';
+        }
+
+        function generateSuggestionsHTML() {
+            const items = document.getElementById('suggestionsItems').value.split(',').map(item => item.trim());
+
+            let html = '<ui-suggestions><div class="suggestions-list">';
+            items.forEach(item => {
+                html += `<div class="suggestion-item">${item}</div>`;
+            });
+            html += '</div></ui-suggestions>';
+            
+            return html;
+        }
+
+        function generateScrollytellingAttributes() {
+            const steps = document.getElementById('scrollytellingSteps').value;
+            if (steps) {
+                return `steps='${steps}'`;
+            }
+            return '';
+        }
+
+        function generateScrollytellingHTML() {
+            const steps = JSON.parse(document.getElementById('scrollytellingSteps').value || '[]');
+
+            let html = '<ui-scrollytelling><div class="scroll-container">';
+            steps.forEach(step => {
+                html += `<div class="scroll-step">
+                    <h3>${step.title}</h3>
+                    <p>${step.content}</p>
+                </div>`;
+            });
+            html += '</div></ui-scrollytelling>';
+            
+            return html;
+        }
+
+        function generateLyricAttributes() {
+            const text = document.getElementById('lyricText').value;
+            const author = document.getElementById('lyricAuthor').value;
+
+            let attrs = [];
+            if (text) attrs.push(`text="${text}"`);
+            if (author) attrs.push(`author="${author}"`);
+
+            return attrs.join(' ');
+        }
+
+        function generateLyricHTML() {
+            const text = document.getElementById('lyricText').value;
+            const author = document.getElementById('lyricAuthor').value;
+
+            let html = '<ui-lyric>';
+            html += `<div class="lyric-text">${text}</div>`;
+            html += `<div class="lyric-author">${author}</div>`;
+            html += '</ui-lyric>';
+            
+            return html;
+        }
+
+        function generateCardStackAttributes() {
+            const items = document.getElementById('cardStackItems').value;
+            if (items) {
+                return `items='${items}'`;
+            }
+            return '';
+        }
+
+        function generateCardStackHTML() {
+            const items = JSON.parse(document.getElementById('cardStackItems').value || '[]');
+
+            let html = '<ui-card-stack><div class="stack-container">';
+            items.forEach((item, index) => {
+                html += `<div class="stack-card ${index === 0 ? 'active' : ''}">
+                    <h3>${item.title}</h3>
+                    <p>${item.content}</p>
+                </div>`;
+            });
+            html += '</div></ui-card-stack>';
+            
+            return html;
+        }
+
+        function generateSpotlightAttributes() {
+            const content = document.getElementById('spotlightContent').value;
+            if (content) {
+                return `content="${content}"`;
+            }
+            return '';
+        }
+
+        function generateSpotlightHTML() {
+            const content = document.getElementById('spotlightContent').value;
+
+            let html = '<ui-spotlight>';
+            html += `<div class="spotlight-content">${content}</div>`;
+            html += '<div class="spotlight-highlight"></div>';
+            html += '</ui-spotlight>';
+            
+            return html;
+        }
+
+        function generateTickerAttributes() {
+            const items = document.getElementById('tickerItems').value;
+            if (items) {
+                return `items="${items}"`;
+            }
+            return '';
+        }
+
+        function generateTickerHTML() {
+            const items = document.getElementById('tickerItems').value.split(',').map(item => item.trim());
+
+            let html = '<ui-ticker><div class="ticker-container">';
+            items.forEach(item => {
+                html += `<div class="ticker-item">${item}</div>`;
+            });
+            html += '</div></ui-ticker>';
+            
+            return html;
+        }
+
+        function generateNotificationAttributes() {
+            const type = document.getElementById('notificationType').value;
+            const title = document.getElementById('notificationTitle').value;
+            const message = document.getElementById('notificationMessage').value;
+
+            let attrs = [];
+            if (type) attrs.push(`type="${type}"`);
+            if (title) attrs.push(`title="${title}"`);
+            if (message) attrs.push(`message="${message}"`);
+
+            return attrs.join(' ');
+        }
+
+        function generateNotificationHTML() {
+            const type = document.getElementById('notificationType').value;
+            const title = document.getElementById('notificationTitle').value;
+            const message = document.getElementById('notificationMessage').value;
+
+            let html = `<ui-notification class="notification-${type}">`;
+            html += `<div class="notification-title">${title}</div>`;
+            html += `<div class="notification-message">${message}</div>`;
+            html += '<button class="notification-close">×</button>';
+            html += '</ui-notification>';
+            
+            return html;
+        }
+
+        function generateEnhancedMapAttributes() {
+            const latitude = document.getElementById('mapLatitude').value;
+            const longitude = document.getElementById('mapLongitude').value;
+            const zoom = document.getElementById('mapZoom').value;
+
+            let attrs = [];
+            if (latitude) attrs.push(`latitude="${latitude}"`);
+            if (longitude) attrs.push(`longitude="${longitude}"`);
+            if (zoom) attrs.push(`zoom="${zoom}"`);
+
+            return attrs.join(' ');
+        }
+
+        function generateEnhancedMapHTML() {
+            const latitude = document.getElementById('mapLatitude').value;
+            const longitude = document.getElementById('mapLongitude').value;
+            const zoom = document.getElementById('mapZoom').value;
+
+            let html = '<ui-enhanced-map>';
+            html += '<div class="map-container">';
+            html += '<div class="map-placeholder">Map placeholder - Latitude: ' + latitude + ', Longitude: ' + longitude + ', Zoom: ' + zoom + '</div>';
+            html += '</div>';
+            html += '<div class="map-controls">';
+            html += '<button class="map-control">Zoom In</button>';
+            html += '<button class="map-control">Zoom Out</button>';
+            html += '</div>';
+            html += '</ui-enhanced-map>';
+            
+            return html;
+        }
+
+        function generateCardSwiperAttributes() {
+            const cards = document.getElementById('swiperCards').value;
+            const showActions = document.getElementById('swiperShowActions').checked;
+            const autoSwipe = document.getElementById('swiperAutoSwipe').checked;
+            const threshold = document.getElementById('swiperThreshold').value;
+
+            let attrs = [];
+            if (cards) attrs.push(`cards='${cards}'`);
+            if (showActions) attrs.push(`show-actions="true"`);
+            if (autoSwipe) attrs.push(`auto-swipe="true"`);
+            if (threshold) attrs.push(`swipe-threshold="${threshold}"`);
+
+            return attrs.join(' ');
+        }
+
+        function generateCardSwiperHTML() {
+            const cards = document.getElementById('swiperCards').value;
+            const showActions = document.getElementById('swiperShowActions').checked;
+            const autoSwipe = document.getElementById('swiperAutoSwipe').checked;
+            const threshold = document.getElementById('swiperThreshold').value;
+
+            let html = '<ui-card-swiper>';
+            html += '<div class="swiper-container">';
+            html += '<div class="swipe-indicator left">NOPE</div>';
+            html += '<div class="swipe-indicator right">LIKE</div>';
+            
+            try {
+                const cardsArray = JSON.parse(cards);
+                cardsArray.forEach((card, index) => {
+                    html += `
+                        <div class="swiper-card" data-index="${index}" style="z-index: ${cardsArray.length - index};">
+                            <img src="${card.image}" alt="${card.title}" class="card-image">
+                            <div class="card-overlay">
+                                <h3 class="card-title">${card.title}</h3>
+                                <p class="card-subtitle">${card.subtitle}</p>
+                                <p class="card-description">${card.description}</p>
+                                <div class="card-rating">
+                                    <span class="rating-stars">⭐ ${card.rating}</span>
+                                    <span class="rating-text">(${card.rating})</span>
+                                </div>
+                                <div class="card-tags">
+                                    ${card.tags.split(',').map(tag => `<span class="card-tag">${tag.trim()}</span>`).join('')}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+            } catch (e) {
+                html += '<div class="swiper-card"><div class="card-overlay"><h3>Invalid JSON</h3></div></div>';
+            }
+            
+            html += '</div>';
+            
+            if (showActions) {
+                html += `
+                    <div class="swiper-actions">
+                        <button class="action-btn reject">✕</button>
+                        <button class="action-btn accept">♥</button>
+                    </div>
+                `;
+            }
+            
+            html += '</ui-card-swiper>';
+            
+            return html;
+        }
+
+        function generateCalendarAttributes() {
+            const events = document.getElementById('calendarEvents').value;
+            const view = document.getElementById('calendarView').value;
+            const selectable = document.getElementById('calendarSelectable').checked;
+            const multiSelect = document.getElementById('calendarMultiSelect').checked;
+            const firstDay = document.getElementById('calendarFirstDay').value;
+
+            let attrs = [];
+            if (events) attrs.push(`events='${events}'`);
+            if (view) attrs.push(`view="${view}"`);
+            if (selectable) attrs.push(`selectable="true"`);
+            if (multiSelect) attrs.push(`multi-select="true"`);
+            if (firstDay) attrs.push(`first-day="${firstDay}"`);
+
+            return attrs.join(' ');
+        }
+
+        function generateCalendarHTML() {
+            const events = document.getElementById('calendarEvents').value;
+            const view = document.getElementById('calendarView').value;
+            const selectable = document.getElementById('calendarSelectable').checked;
+            const multiSelect = document.getElementById('calendarMultiSelect').checked;
+            const firstDay = document.getElementById('calendarFirstDay').value;
+
+            let html = '<ui-calendar>';
+            html += '<div class="calendar-header">';
+            html += '<div class="calendar-nav left"><button class="nav-btn">‹</button></div>';
+            html += '<div class="calendar-nav right"><button class="nav-btn">›</button></div>';
+            html += '<h2 class="calendar-title">January 2024</h2>';
+            html += '</div>';
+            
+            html += '<div class="calendar-controls">';
+            html += '<div class="view-selector">';
+            html += `<button class="view-btn ${view === 'month' ? 'active' : ''}">Month</button>`;
+            html += `<button class="view-btn ${view === 'week' ? 'active' : ''}">Week</button>`;
+            html += `<button class="view-btn ${view === 'day' ? 'active' : ''}">Day</button>`;
+            html += '</div>';
+            html += '<button class="today-btn">Today</button>';
+            html += '</div>';
+            
+            html += '<div class="calendar-body">';
+            html += '<div class="weekdays">';
+            const weekdays = firstDay === 'monday' ? ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] : ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+            weekdays.forEach(day => {
+                html += `<div class="weekday">${day}</div>`;
+            });
+            html += '</div>';
+            
+            html += '<div class="days-grid">';
+            for (let i = 0; i < 42; i++) {
+                html += `<div class="day"><div class="day-number">${i + 1}</div></div>`;
+            }
+            html += '</div>';
+            html += '</div>';
+            html += '</ui-calendar>';
+            
+            return html;
+        }
+
+        function generateMediaPlayerAttributes() {
+            const type = document.getElementById('mediaType').value;
+            const src = document.getElementById('mediaSrc').value;
+            const poster = document.getElementById('mediaPoster').value;
+            const title = document.getElementById('mediaTitle').value;
+            const description = document.getElementById('mediaDescription').value;
+            const playlist = document.getElementById('mediaPlaylist').value;
+            const showPlaylist = document.getElementById('mediaShowPlaylist').checked;
+            const autoplay = document.getElementById('mediaAutoplay').checked;
+            const loop = document.getElementById('mediaLoop').checked;
+
+            let attrs = [];
+            if (type) attrs.push(`type="${type}"`);
+            if (src) attrs.push(`src="${src}"`);
+            if (poster) attrs.push(`poster="${poster}"`);
+            if (title) attrs.push(`title="${title}"`);
+            if (description) attrs.push(`description="${description}"`);
+            if (playlist) attrs.push(`playlist='${playlist}'`);
+            if (showPlaylist) attrs.push(`show-playlist="true"`);
+            if (autoplay) attrs.push(`autoplay="true"`);
+            if (loop) attrs.push(`loop="true"`);
+
+            return attrs.join(' ');
+        }
+
+        function generateMediaPlayerHTML() {
+            const type = document.getElementById('mediaType').value;
+            const src = document.getElementById('mediaSrc').value;
+            const poster = document.getElementById('mediaPoster').value;
+            const title = document.getElementById('mediaTitle').value;
+            const description = document.getElementById('mediaDescription').value;
+            const playlist = document.getElementById('mediaPlaylist').value;
+            const showPlaylist = document.getElementById('mediaShowPlaylist').checked;
+            const autoplay = document.getElementById('mediaAutoplay').checked;
+            const loop = document.getElementById('mediaLoop').checked;
+
+            let html = '<ui-media-player>';
+            html += '<div class="player-container">';
+            html += `<${type} class="media-element" ${poster ? `poster="${poster}"` : ''} ${autoplay ? 'autoplay' : ''} ${loop ? 'loop' : ''}>`;
+            html += `<source src="${src}" type="${type === 'video' ? 'video/mp4' : 'audio/mpeg'}">`;
+            html += `Your browser does not support the ${type} element.`;
+            html += `</${type}>`;
+            
+            html += '<div class="player-overlay">';
+            html += '<button class="play-button">▶</button>';
+            html += '</div>';
+            
+            html += '<div class="controls-bar">';
+            html += '<div class="progress-container">';
+            html += '<div class="progress-bar"></div>';
+            html += '</div>';
+            
+            html += '<div class="controls-row">';
+            html += '<div class="controls-left">';
+            html += '<button class="control-btn">▶</button>';
+            html += '<button class="control-btn">⏮</button>';
+            html += '<button class="control-btn">⏭</button>';
+            html += '<span class="time-display">00:00 / 00:00</span>';
+            html += '</div>';
+            
+            html += '<div class="controls-right">';
+            html += '<div class="volume-container">';
+            html += '<button class="control-btn">🔊</button>';
+            html += '<div class="volume-slider">';
+            html += '<div class="volume-level"></div>';
+            html += '</div>';
+            html += '</div>';
+            if (showPlaylist) {
+                html += '<button class="control-btn">📋</button>';
+            }
+            html += '<button class="fullscreen-btn">⛶</button>';
+            html += '</div>';
+            html += '</div>';
+            html += '</div>';
+            
+            html += '<div class="player-info">';
+            html += `<h3 class="media-title">${title}</h3>`;
+            html += `<p class="media-description">${description}</p>`;
+            html += '</div>';
+            html += '</ui-media-player>';
+            
+            return html;
+        }
+
+        function generateLyricAttributes() {
+            const text = document.getElementById('lyricText').value;
+            const mode = document.getElementById('lyricMode').value;
+            const cursor = document.getElementById('lyricCursor').checked;
+            const speed = document.getElementById('lyricSpeed').value;
+
+            let attrs = [];
+            if (text) attrs.push(`text="${text}"`);
+            if (mode) attrs.push(`mode="${mode}"`);
+            if (cursor) attrs.push(`cursor="true"`);
+            if (speed) attrs.push(`speed="${speed}"`);
+
+            return attrs.join(' ');
+        }
+
+        function generateLyricHTML() {
+            const text = document.getElementById('lyricText').value;
+            const mode = document.getElementById('lyricMode').value;
+            const cursor = document.getElementById('lyricCursor').checked;
+            const speed = document.getElementById('lyricSpeed').value;
+
+            let html = '<ui-lyric>';
+            html += '<div class="wrap">';
+            
+            const words = mode === 'line' ? text.split(/\n+/) : text.split(/(\s+)/);
+            words.forEach(word => {
+                html += `<span class="w">${word}</span>`;
+            });
+            
+            if (cursor) {
+                html += '<span class="cursor"></span>';
+            }
+            
+            html += '</div>';
+            html += '</ui-lyric>';
+            
+            return html;
+        }
+
+        function generateSpotlightAttributes() {
+            const sections = document.getElementById('spotlightSections').value;
+            const activeIndex = document.getElementById('spotlightActiveIndex').value;
+
+            let attrs = [];
+            if (sections) attrs.push(`sections='${sections}'`);
+            if (activeIndex) attrs.push(`activeIndex="${activeIndex}"`);
+
+            return attrs.join(' ');
+        }
+
+        function generateSpotlightHTML() {
+            const sections = document.getElementById('spotlightSections').value;
+            const activeIndex = parseInt(document.getElementById('spotlightActiveIndex').value);
+
+            let html = '<ui-spotlight>';
+            
+            try {
+                const sectionsArray = JSON.parse(sections);
+                sectionsArray.forEach((section, index) => {
+                    const isActive = index === activeIndex ? 'active' : '';
+                    html += `
+                        <article class="sec ${isActive}" tabindex="0" data-i="${index}">
+                            <div class="title">${section.title}</div>
+                            <div class="text">${section.text}</div>
+                        </article>
+                    `;
+                });
+            } catch (e) {
+                html += '<article class="sec active"><div class="title">Error</div><div class="text">Invalid JSON format</div></article>';
+            }
+            
+            html += '</ui-spotlight>';
+            
+            return html;
+        }
+
+        // List Component Functions
+        function generateListAttributes() {
+            const items = document.getElementById('listItems').value;
+            const type = document.getElementById('listType').value;
+
+            let attrs = [];
+            if (items) attrs.push(`items="${items}"`);
+            if (type) attrs.push(`type="${type}"`);
+
+            return attrs.join(' ');
+        }
+
+        function generateListHTML() {
+            const items = document.getElementById('listItems').value;
+            const type = document.getElementById('listType').value;
+
+            let html = `<ui-list items="${items}" type="${type}"></ui-list>`;
+            return html;
+        }
+
+        // Divider Component Functions
+        function generateDividerAttributes() {
+            const label = document.getElementById('dividerLabel').value;
+            const style = document.getElementById('dividerStyle').value;
+
+            let attrs = [];
+            if (label) attrs.push(`label="${label}"`);
+            if (style) attrs.push(`style="${style}"`);
+
+            return attrs.join(' ');
+        }
+
+        function generateDividerHTML() {
+            const label = document.getElementById('dividerLabel').value;
+            const style = document.getElementById('dividerStyle').value;
+
+            let html = `<ui-divider label="${label}" style="${style}"></ui-divider>`;
+            return html;
+        }
+
+        // Tabs Component Functions
+        function generateTabsAttributes() {
+            const tabsData = document.getElementById('tabsData').value;
+
+            let attrs = [];
+            if (tabsData) attrs.push(`tabs='${tabsData}'`);
+
+            return attrs.join(' ');
+        }
+
+        function generateTabsHTML() {
+            const tabsData = document.getElementById('tabsData').value;
+
+            let html = `<ui-tabs tabs='${tabsData}'></ui-tabs>`;
+            return html;
+        }
+
+        // Map Component Functions
+        function generateMapAttributes() {
+            const latitude = document.getElementById('mapLatitude').value;
+            const longitude = document.getElementById('mapLongitude').value;
+            const zoom = document.getElementById('mapZoom').value;
+
+            let attrs = [];
+            if (latitude) attrs.push(`latitude="${latitude}"`);
+            if (longitude) attrs.push(`longitude="${longitude}"`);
+            if (zoom) attrs.push(`zoom="${zoom}"`);
+
+            return attrs.join(' ');
+        }
+
+        function generateMapHTML() {
+            const latitude = document.getElementById('mapLatitude').value;
+            const longitude = document.getElementById('mapLongitude').value;
+            const zoom = document.getElementById('mapZoom').value;
+
+            let html = `<ui-map latitude="${latitude}" longitude="${longitude}" zoom="${zoom}"></ui-map>`;
+            return html;
+        }
+
+        // Dynamic Map Component Functions
+        function generateDynamicMapAttributes() {
+            const latitude = document.getElementById('dynamicMapLatitude').value;
+            const longitude = document.getElementById('dynamicMapLongitude').value;
+            const zoom = document.getElementById('dynamicMapZoom').value;
+
+            let attrs = [];
+            if (latitude) attrs.push(`latitude="${latitude}"`);
+            if (longitude) attrs.push(`longitude="${longitude}"`);
+            if (zoom) attrs.push(`zoom="${zoom}"`);
+
+            return attrs.join(' ');
+        }
+
+        function generateDynamicMapHTML() {
+            const latitude = document.getElementById('dynamicMapLatitude').value;
+            const longitude = document.getElementById('dynamicMapLongitude').value;
+            const zoom = document.getElementById('dynamicMapZoom').value;
+
+            let html = `<ui-dynamic-map latitude="${latitude}" longitude="${longitude}" zoom="${zoom}"></ui-dynamic-map>`;
+            return html;
+        }
+
+        function generateCarouselAttributes() {
+            const images = document.getElementById('carouselImages').value;
+            const interval = document.getElementById('carouselInterval').value;
+
+            let attrs = [];
+            if (images) attrs.push(`images="${images}"`);
+            if (interval) attrs.push(`interval="${interval}"`);
+
+            return attrs.join(' ');
+        }
+
+        function generateCarouselHTML() {
+            const images = document.getElementById('carouselImages').value;
+            const interval = document.getElementById('carouselInterval').value;
+
+            let html = `<ui-carousel images="${images}" interval="${interval}"></ui-carousel>`;
+            return html;
+        }
+
+        // Auto-generate on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            // Set default component
+            document.getElementById('componentType').value = 'card';
+            showComponentForm();
+            generateComponent();
+        });
+    </script>
+</body>
+</html>

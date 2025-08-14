@@ -1,0 +1,52 @@
+<!-- Scrollytelling (pinned narrative with step triggers) -->
+<div class="demo-section">
+    <h2 class="demo-title">27. Scrollytelling</h2>
+    <ui-scrollytelling 
+        steps='[{"title":"Setup","snippet":"Configure the environment"},{"title":"Plan","snippet":"Outline the approach"},{"title":"Deliver","snippet":"Stream and refine"}]'
+        pinned="true">
+    </ui-scrollytelling>
+
+    <style>
+    ui-scrollytelling { display:block; }
+    ui-scrollytelling .wrap { display:grid; grid-template-columns: 1fr 2fr; gap: var(--size-4); min-height: 360px; }
+    ui-scrollytelling .steps { display:flex; flex-direction:column; gap: var(--size-3); }
+    ui-scrollytelling .step { padding: var(--size-3); border:1px solid var(--surface-3); border-radius: var(--radius-size); background: var(--surface-1); cursor:pointer; }
+    ui-scrollytelling .step.active { border-color: var(--color-primary); box-shadow: var(--shadow-soft); }
+    ui-scrollytelling .pinned { position: sticky; top: 1rem; align-self: start; padding: var(--size-4); border:1px solid var(--surface-3); border-radius: var(--radius-size); background: var(--surface-1); min-height: 280px; }
+    ui-scrollytelling .title { font-weight: 700; }
+    ui-scrollytelling .snippet { color: var(--text-2); }
+    ui-scrollytelling .main { color: var(--text-1); line-height:1.6; margin-top: var(--size-2); }
+    </style>
+
+    <script>
+    function initScrollytelling(){
+        document.querySelectorAll('ui-scrollytelling').forEach(root => {
+            const steps = safeParseJSON(root.getAttribute('steps')) || [];
+            let html = '<div class="wrap">';
+            html += '<div class="steps">' + steps.map((s,i)=>`<div class="step" data-i="${i}"><div class="title">${escapeHtml(s.title||'')}</div><div class="snippet">${escapeHtml(s.snippet||'')}</div></div>`).join('') + '</div>';
+            html += '<div class="pinned"><div class="title">&nbsp;</div><div class="main">Select a step…</div></div>';
+            html += '</div>';
+            root.innerHTML = html;
+
+            const stepEls = [...root.querySelectorAll('.step')];
+            const pinned = root.querySelector('.pinned');
+            function setActive(i){
+                stepEls.forEach((el,idx)=> el.classList.toggle('active', idx===i));
+                const s = steps[i];
+                pinned.querySelector('.title').textContent = s.title||'';
+                pinned.querySelector('.main').textContent = s.snippet||'';
+            }
+            stepEls.forEach(el=>{
+                el.addEventListener('mouseenter', ()=> setActive(Number(el.getAttribute('data-i'))));
+                el.addEventListener('click', ()=> setActive(Number(el.getAttribute('data-i'))));
+            });
+            setActive(0);
+        });
+    }
+    function safeParseJSON(str){ try { return JSON.parse(str); } catch { return null; } }
+    function escapeHtml(text){ const div=document.createElement('div'); div.textContent=text||''; return div.innerHTML; }
+    document.addEventListener('DOMContentLoaded', initScrollytelling);
+    </script>
+</div>
+
+

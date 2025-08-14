@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Components - Quick Start Guide</title>
+    <link rel="stylesheet" href="https://unpkg.com/chota@latest">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="components/simple-components.js"></script>
+    <style>
+        @import "https://unpkg.com/open-props";
+        
+        :root {
+            --brand-hue: 25;
+            --radius-size: 1rem;
+            --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --color-primary: hsl(var(--brand-hue) 95% 60%);
+            --animation-smooth: cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, hsl(var(--brand-hue) 20% 95%), hsl(calc(var(--brand-hue) + 60) 20% 95%));
+            min-height: 100vh;
+            margin: 0;
+            padding: 2rem;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-size);
+            box-shadow: var(--shadow-soft);
+        }
+
+        header h1 {
+            background: linear-gradient(135deg, var(--color-primary), hsl(calc(var(--brand-hue) + 30) 80% 60%));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .step-section {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: var(--radius-size);
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow-soft);
+        }
+
+        .step-number {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: var(--color-primary);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-weight: 600;
+            margin-right: 1rem;
+        }
+
+        .step-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--color-primary);
+        }
+
+        .code-block {
+            background: #1f2937;
+            color: #f9fafb;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Monaco', 'Menlo', monospace;
+            font-size: 0.875rem;
+            line-height: 1.5;
+            margin: 1rem 0;
+            overflow-x: auto;
+        }
+
+        .demo-area {
+            border: 2px dashed #d1d5db;
+            border-radius: 0.5rem;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .method-tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .method-tab {
+            padding: 0.5rem 1rem;
+            background: #f3f4f6;
+            border: none;
+            border-radius: 0.25rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: all 0.3s var(--animation-smooth);
+        }
+
+        .method-tab.active {
+            background: var(--color-primary);
+            color: white;
+        }
+
+        .method-content {
+            display: none;
+        }
+
+        .method-content.active {
+            display: block;
+        }
+
+        .action-btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--color-primary);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s var(--animation-smooth);
+            margin: 0.5rem 0.5rem 0.5rem 0;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .action-btn.secondary {
+            background: #6b7280;
+        }
+
+        .action-btn.success {
+            background: #10b981;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #fef3c7 0%, #fde68a 100%);
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-weight: 500;
+        }
+
+        .tip {
+            background: #dbeafe;
+            border-left: 4px solid #3b82f6;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 0.25rem;
+        }
+
+        .tip strong {
+            color: #1e40af;
+        }
+
+        /* Component Styles */
+        .card {
+            background: white;
+            border-radius: 0.5rem;
+            padding: 1rem;
+            box-shadow: var(--shadow-soft);
+            transition: all 0.3s var(--animation-smooth);
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 0.5rem;
+            margin: 0.5rem 0;
+        }
+
+        .alert-success { background: #d1fae5; color: #065f46; }
+        .alert-info { background: #dbeafe; color: #1e40af; }
+
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            margin: 0.25rem;
+        }
+
+        .badge-primary { background: var(--color-primary); color: white; }
+        .badge-success { background: #10b981; color: white; }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+        }
+
+        .table th,
+        .table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .table th {
+            background: #f9fafb;
+            font-weight: 600;
+        }
+
+        .table-striped tbody tr:nth-child(even) {
+            background: #f9fafb;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🚀 Quick Start Guide</h1>
+            <p>Get up and running with UI Components in under 5 minutes</p>
+        </header>
+
+        <!-- Step 1: Installation -->
+        <div class="step-section">
+            <div class="step-title">
+                <span class="step-number">1</span>
+                Installation
+            </div>
+            <p>Include the required files in your HTML project:</p>
+            
+            <div class="method-tabs">
+                <button class="method-tab active" onclick="showMethod('install', 'basic')">Basic Setup</button>
+                <button class="method-tab" onclick="showMethod('install', 'advanced')">Advanced Setup</button>
+            </div>
+
+            <div id="install-basic" class="method-content active">
+                <div class="code-block">
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;My Project&lt;/title&gt;
+    &lt;!-- Include Chota CSS --&gt;
+    &lt;link rel="stylesheet" href="https://unpkg.com/chota@latest"&gt;
+    &lt;!-- Include Open Props --&gt;
+    &lt;link rel="stylesheet" href="https://unpkg.com/open-props"&gt;
+    &lt;!-- Include Simple Components API --&gt;
+    &lt;script src="components/simple-components.js"&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;!-- Your content here --&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+                </div>
+            </div>
+
+            <div id="install-advanced" class="method-content">
+                <div class="code-block">
+&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+    &lt;title&gt;My Project&lt;/title&gt;
+    &lt;!-- Include Chota CSS --&gt;
+    &lt;link rel="stylesheet" href="https://unpkg.com/chota@latest"&gt;
+    &lt;!-- Include Google Fonts --&gt;
+    &lt;link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"&gt;
+    &lt;!-- Include Open Props --&gt;
+    &lt;link rel="stylesheet" href="https://unpkg.com/open-props"&gt;
+    &lt;!-- Include Simple Components API --&gt;
+    &lt;script src="components/simple-components.js"&gt;&lt;/script&gt;
+    &lt;style&gt;
+        @import "https://unpkg.com/open-props";
+        :root {
+            --brand-hue: 250;
+            --color-primary: hsl(var(--brand-hue) 80% 60%);
+        }
+        * { font-family: 'Inter', sans-serif; }
+    &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;!-- Your content here --&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+                </div>
+            </div>
+
+            <div class="tip">
+                <strong>💡 Tip:</strong> The Simple Components API automatically registers all custom elements and provides a global <code>UI</code> object for easy component creation.
+            </div>
+        </div>
+
+        <!-- Step 2: Your First Component -->
+        <div class="step-section">
+            <div class="step-title">
+                <span class="step-number">2</span>
+                Your First Component
+            </div>
+            <p>Create your first component using either HTML tags or JavaScript API:</p>
+            
+            <div class="method-tabs">
+                <button class="method-tab active" onclick="showMethod('first', 'html')">HTML Tags</button>
+                <button class="method-tab" onclick="showMethod('first', 'js')">JavaScript API</button>
+            </div>
+
+            <div id="first-html" class="method-content active">
+                <div class="code-block">
+&lt;!-- Simple Card Component --&gt;
+&lt;ui-card 
+    title="Welcome to UI Components"
+    content="This is your first component!"
+    actionText="Get Started"
+    actionLink="#"
+&gt;&lt;/ui-card&gt;
+                </div>
+                <div class="demo-area" id="first-demo-html">
+                    <ui-card 
+                        title="Welcome to UI Components"
+                        content="This is your first component!"
+                        actionText="Get Started"
+                        actionLink="#">
+                    </ui-card>
+                </div>
+            </div>
+
+            <div id="first-js" class="method-content">
+                <div class="code-block">
+// Create a card using JavaScript API
+const card = UI.card({
+    title: "Welcome to UI Components",
+    content: "This is your first component!",
+    actionText: "Get Started",
+    actionLink: "#"
+});
+
+// Insert it into the page
+UI.insert('#first-demo-js', card);
+                </div>
+                <div class="demo-area" id="first-demo-js">
+                    <button class="action-btn" onclick="createFirstComponent()">Create Component</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Multiple Components -->
+        <div class="step-section">
+            <div class="step-title">
+                <span class="step-number">3</span>
+                Multiple Components
+            </div>
+            <p>Combine different components to create rich interfaces:</p>
+            
+            <div class="method-tabs">
+                <button class="method-tab active" onclick="showMethod('multiple', 'html')">HTML Tags</button>
+                <button class="method-tab" onclick="showMethod('multiple', 'js')">JavaScript API</button>
+            </div>
+
+            <div id="multiple-html" class="method-content active">
+                <div class="code-block">
+&lt;!-- Product Card with Badge --&gt;
+&lt;ui-card 
+    title="Premium Product"
+    subtitle="Luxury Category"
+    image="https://picsum.photos/400/250"
+    content="High-quality product with amazing features."
+    actionText="Buy Now"
+    badge="Featured"
+&gt;&lt;/ui-card&gt;
+
+&lt;!-- User Table --&gt;
+&lt;ui-table 
+    headers="Name,Email,Role,Status"
+    rows="John Doe,john@example.com,Developer,Active;Jane Smith,jane@example.com,Designer,Active"
+    striped="true"
+&gt;&lt;/ui-table&gt;
+
+&lt;!-- Success Alert --&gt;
+&lt;ui-alert 
+    type="success"
+    message="Product added to cart successfully!"
+    duration="3000"
+&gt;&lt;/ui-alert&gt;
+                </div>
+                <div class="demo-area" id="multiple-demo-html">
+                    <ui-card 
+                        title="Premium Product"
+                        subtitle="Luxury Category"
+                        image="https://picsum.photos/400/250"
+                        content="High-quality product with amazing features."
+                        actionText="Buy Now"
+                        badge="Featured">
+                    </ui-card>
+                    
+                    <ui-table 
+                        headers="Name,Email,Role,Status"
+                        rows="John Doe,john@example.com,Developer,Active;Jane Smith,jane@example.com,Designer,Active"
+                        striped="true">
+                    </ui-table>
+                    
+                    <ui-alert 
+                        type="success"
+                        message="Product added to cart successfully!"
+                        duration="3000">
+                    </ui-alert>
+                </div>
+            </div>
+
+            <div id="multiple-js" class="method-content">
+                <div class="code-block">
+// Create multiple components programmatically
+const productCard = UI.card({
+    title: "Premium Product",
+    subtitle: "Luxury Category",
+    image: "https://picsum.photos/400/250",
+    content: "High-quality product with amazing features.",
+    actionText: "Buy Now",
+    badge: "Featured"
+});
+
+const userData = [
+    { name: "John Doe", email: "john@example.com", role: "Developer", status: "Active" },
+    { name: "Jane Smith", email: "jane@example.com", role: "Designer", status: "Active" }
+];
+
+const userTable = UI.table(userData, { striped: true });
+const successAlert = UI.success("Product added to cart successfully!");
+
+// Insert all components
+UI.insert('#multiple-demo-js', productCard + userTable + successAlert);
+                </div>
+                <div class="demo-area" id="multiple-demo-js">
+                    <button class="action-btn" onclick="createMultipleComponents()">Create Multiple Components</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Customization -->
+        <div class="step-section">
+            <div class="step-title">
+                <span class="step-number">4</span>
+                Customization
+            </div>
+            <p>Customize the look and feel to match your brand:</p>
+            
+            <div class="method-tabs">
+                <button class="method-tab active" onclick="showMethod('customize', 'css')">CSS Variables</button>
+                <button class="method-tab" onclick="showMethod('customize', 'themes')">Theme Examples</button>
+            </div>
+
+            <div id="customize-css" class="method-content active">
+                <div class="code-block">
+&lt;style&gt;
+:root {
+    /* Brand Colors */
+    --brand-hue: 200; /* Blue theme */
+    --color-primary: hsl(var(--brand-hue) 80% 60%);
+    --color-secondary: hsl(calc(var(--brand-hue) + 60) 80% 60%);
+    
+    /* Spacing */
+    --radius-size: 0.75rem;
+    --shadow-soft: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    
+    /* Typography */
+    --font-size-fluid: clamp(0.875rem, 2vw, 1rem);
+}
+
+/* Custom component styles */
+ui-card {
+    border: 2px solid var(--color-primary);
+}
+
+ui-alert {
+    border-radius: var(--radius-size);
+}
+&lt;/style&gt;
+                </div>
+                <div class="demo-area" id="customize-demo-css">
+                    <ui-card 
+                        title="Customized Card"
+                        content="This card uses custom CSS variables for theming."
+                        actionText="Learn More">
+                    </ui-card>
+                </div>
+            </div>
+
+            <div id="customize-themes" class="method-content">
+                <div class="demo-area" id="customize-demo-themes">
+                    <h4>Theme Examples:</h4>
+                    <button class="action-btn" onclick="applyTheme('blue')">Blue Theme</button>
+                    <button class="action-btn secondary" onclick="applyTheme('green')">Green Theme</button>
+                    <button class="action-btn success" onclick="applyTheme('purple')">Purple Theme</button>
+                    
+                    <div id="theme-demo">
+                        <ui-card 
+                            title="Theme Demo"
+                            content="This card will change colors based on the selected theme."
+                            actionText="Try Themes">
+                        </ui-card>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 5: Next Steps -->
+        <div class="step-section">
+            <div class="step-title">
+                <span class="step-number">5</span>
+                Next Steps
+            </div>
+            <p>You're ready to build amazing interfaces! Here's what you can do next:</p>
+            
+            <div class="method-tabs">
+                <button class="method-tab active" onclick="showMethod('next', 'explore')">Explore Components</button>
+                <button class="method-tab" onclick="showMethod('next', 'build')">Build Something</button>
+            </div>
+
+            <div id="next-explore" class="method-content active">
+                <div class="demo-area">
+                    <h4>🎯 Explore More Components:</h4>
+                    <div class="quick-actions">
+                        <button class="action-btn" onclick="window.open('usage-examples.html', '_blank')">View Usage Examples</button>
+                        <button class="action-btn secondary" onclick="window.open('component-builder.html', '_blank')">Try Component Builder</button>
+                        <button class="action-btn success" onclick="window.open('components/index.html', '_blank')">Browse All Components</button>
+                    </div>
+                    
+                    <h4>📚 Available Components:</h4>
+                    <ui-chips labels="Card,Table,Alert,Badge,Avatar,Chips,Accordion,Carousel,Divider,List" color="primary"></ui-chips>
+                </div>
+            </div>
+
+            <div id="next-build" class="method-content">
+                <div class="demo-area">
+                    <h4>🚀 Build Your First Project:</h4>
+                    <div class="code-block">
+// Example: Create a product catalog
+const products = [
+    { name: "Product 1", price: "$99", category: "Electronics" },
+    { name: "Product 2", price: "$149", category: "Fashion" },
+    { name: "Product 3", price: "$79", category: "Home" }
+];
+
+// Create product cards
+products.forEach(product => {
+    const card = UI.card({
+        title: product.name,
+        subtitle: product.category,
+        content: `Price: ${product.price}`,
+        actionText: "Add to Cart",
+        badge: "New"
+    });
+    UI.insert('#product-grid', card);
+});
+
+// Show success message
+UI.success("Products loaded successfully!");
+                    </div>
+                    
+                    <button class="action-btn" onclick="buildProductCatalog()">Build Product Catalog</button>
+                    <div id="product-grid" class="component-grid"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Reference -->
+        <div class="step-section">
+            <div class="step-title">
+                <span class="step-number">📋</span>
+                Quick Reference
+            </div>
+            <p>Common component usage patterns:</p>
+            
+            <div class="code-block">
+// Quick Alerts
+UI.success("Success message");
+UI.error("Error message");
+UI.warning("Warning message");
+UI.info("Info message");
+
+// Simple Components
+UI.card({ title: "Title", content: "Content" });
+UI.table(dataArray, { striped: true });
+UI.badge("Label", "primary");
+UI.avatar("image.jpg", { size: "medium" });
+UI.chips(["tag1", "tag2"], { color: "primary" });
+
+// Insert into DOM
+UI.insert('#container', componentHTML);
+UI.replace('#container', componentHTML);
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showMethod(section, method) {
+            // Hide all method contents for this section
+            const contents = document.querySelectorAll(`#${section}-basic, #${section}-advanced, #${section}-html, #${section}-js, #${section}-css, #${section}-themes, #${section}-explore, #${section}-build`);
+            contents.forEach(content => content.classList.remove('active'));
+            
+            // Show selected method content
+            const selectedContent = document.getElementById(`${section}-${method}`);
+            if (selectedContent) {
+                selectedContent.classList.add('active');
+            }
+            
+            // Update tab states
+            const tabs = event.target.parentElement.querySelectorAll('.method-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+        }
+
+        // Demo functions
+        function createFirstComponent() {
+            const card = UI.card({
+                title: "Welcome to UI Components",
+                content: "This is your first component!",
+                actionText: "Get Started",
+                actionLink: "#"
+            });
+            UI.replace('#first-demo-js', card);
+        }
+
+        function createMultipleComponents() {
+            const productCard = UI.card({
+                title: "Premium Product",
+                subtitle: "Luxury Category",
+                image: "https://picsum.photos/400/250",
+                content: "High-quality product with amazing features.",
+                actionText: "Buy Now",
+                badge: "Featured"
+            });
+
+            const userData = [
+                { name: "John Doe", email: "john@example.com", role: "Developer", status: "Active" },
+                { name: "Jane Smith", email: "jane@example.com", role: "Designer", status: "Active" }
+            ];
+
+            const userTable = UI.table(userData, { striped: true });
+            const successAlert = UI.success("Product added to cart successfully!");
+
+            UI.replace('#multiple-demo-js', productCard + userTable + successAlert);
+        }
+
+        function applyTheme(theme) {
+            const themes = {
+                blue: { hue: 200, name: "Blue" },
+                green: { hue: 142, name: "Green" },
+                purple: { hue: 250, name: "Purple" }
+            };
+
+            const selectedTheme = themes[theme];
+            document.documentElement.style.setProperty('--brand-hue', selectedTheme.hue);
+            
+            UI.success(`${selectedTheme.name} theme applied!`);
+        }
+
+        function buildProductCatalog() {
+            const products = [
+                { name: "Wireless Headphones", price: "$99", category: "Electronics", image: "https://picsum.photos/300/200?random=1" },
+                { name: "Designer Watch", price: "$149", category: "Fashion", image: "https://picsum.photos/300/200?random=2" },
+                { name: "Smart Speaker", price: "$79", category: "Home", image: "https://picsum.photos/300/200?random=3" }
+            ];
+
+            let catalogHTML = '';
+            products.forEach(product => {
+                const card = UI.card({
+                    title: product.name,
+                    subtitle: product.category,
+                    image: product.image,
+                    content: `Price: ${product.price}`,
+                    actionText: "Add to Cart",
+                    badge: "New"
+                });
+                catalogHTML += card;
+            });
+
+            UI.replace('#product-grid', catalogHTML);
+            UI.success("Product catalog created successfully!");
+        }
+    </script>
+</body>
+</html>

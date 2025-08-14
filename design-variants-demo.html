@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI Component Design Variants Demo</title>
+    <link rel="stylesheet" href="https://unpkg.com/chota@latest">
+    <link rel="stylesheet" href="https://unpkg.com/open-props@1.5.10/open-props.min.css">
+    <link rel="stylesheet" href="components/component-styles.css">
+    <script src="components/simple-components.js"></script>
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        
+        .demo-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .demo-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: white;
+        }
+        
+        .demo-header h1 {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 1rem;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .demo-header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .variant-section {
+            margin-bottom: 4rem;
+            padding: 2rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .variant-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: white;
+            text-align: center;
+        }
+        
+        .variant-description {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 2rem;
+            font-size: 1.1rem;
+        }
+        
+        .component-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .component-showcase {
+            padding: 1.5rem;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .component-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: white;
+            text-align: center;
+        }
+        
+        .code-example {
+            background: rgba(0, 0, 0, 0.3);
+            color: #00ff00;
+            padding: 1rem;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            margin-top: 1rem;
+            overflow-x: auto;
+        }
+        
+        .aurora-background {
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3, #54a0ff);
+            background-size: 400% 400%;
+            animation: aurora-flow 8s ease infinite;
+            padding: 2rem;
+            border-radius: 15px;
+            margin-bottom: 2rem;
+        }
+        
+        @keyframes aurora-flow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .cyberpunk-background {
+            background: #0a0a0a;
+            border: 2px solid #00ff00;
+            box-shadow: 0 0 20px rgba(0, 255, 0, 0.3);
+            padding: 2rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+        }
+        
+        .neumorphism-background {
+            background: #e0e5ec;
+            padding: 2rem;
+            border-radius: 20px;
+            margin-bottom: 2rem;
+        }
+        
+        .claymorphism-background {
+            background: linear-gradient(145deg, #f0f0f3, #cacace);
+            padding: 2rem;
+            border-radius: 30px;
+            margin-bottom: 2rem;
+        }
+        
+        .brutalism-background {
+            background: #ffffff;
+            border: 3px solid #000000;
+            box-shadow: 8px 8px 0px #000000;
+            padding: 2rem;
+            margin-bottom: 2rem;
+        }
+        
+        .minimal-background {
+            background: #ffffff;
+            padding: 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-header">
+            <h1>🎨 Design Variants Showcase</h1>
+            <p>Explore 6 modern design styles applied to our UI components</p>
+        </div>
+
+        <!-- GlassMorphism Section -->
+        <div class="variant-section">
+            <h2 class="variant-title">✨ GlassMorphism</h2>
+            <p class="variant-description">Frosted glass effect with backdrop blur and transparency</p>
+            <div class="component-grid">
+                <div class="component-showcase">
+                    <div class="component-title">Card Component</div>
+                    <ui-card 
+                        title="Glass Card"
+                        subtitle="Frosted glass effect"
+                        content="This card demonstrates the glassmorphism design with backdrop blur and transparency."
+                        actionText="Learn More"
+                        designVariant="glassmorphism">
+                    </ui-card>
+                    <div class="code-example">
+&lt;ui-card designVariant="glassmorphism"&gt;
+                    </div>
+                </div>
+                
+                <div class="component-showcase">
+                    <div class="component-title">Badge Component</div>
+                    <ui-badge label="Glass Badge" designVariant="glassmorphism"></ui-badge>
+                    <div class="code-example">
+&lt;ui-badge designVariant="glassmorphism"&gt;
+                    </div>
+                </div>
+                
+                <div class="component-showcase">
+                    <div class="component-title">Alert Component</div>
+                    <ui-alert 
+                        type="info"
+                        message="This alert uses glassmorphism design"
+                        designVariant="glassmorphism">
+                    </ui-alert>
+                    <div class="code-example">
+&lt;ui-alert designVariant="glassmorphism"&gt;
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Neumorphism Section -->
+        <div class="neumorphism-background">
+            <h2 class="variant-title">🎭 Neumorphism</h2>
+            <p class="variant-description">Soft, extruded shapes with subtle shadows</p>
+            <div class="component-grid">
+                <div class="component-showcase">
+                    <div class="component-title">Card (Soft)</div>
+                    <ui-card 
+                        title="Soft Neumorphic Card"
+                        subtitle="Gentle elevation"
+                        content="This card appears to gently rise from the surface with soft shadows."
+                        actionText="Explore"
+                        designVariant="neumorphism-soft">
+                    </ui-card>
+                    <div class="code-example">
+&lt;ui-card designVariant="neumorphism-soft"&gt;
+                    </div>
+                </div>
+                
+                <div class="component-showcase">
+                    <div class="component-title">Card (Pressed)</div>
+                    <ui-card 
+                        title="Pressed Neumorphic Card"
+                        subtitle="Pressed into surface"
+                        content="This card appears to be pushed into the surface with inset shadows."
+                        actionText="Press Me"
+                        designVariant="neumorphism-pressed">
+                    </ui-card>
+                    <div class="code-example">
+&lt;ui-card designVariant="neumorphism-pressed"&gt;
+                    </div>
+                </div>
+                
+                <div class="component-showcase">
+                    <div class="component-title">Badge</div>
+                    <ui-badge label="Neumorphic" designVariant="neumorphism-soft"></ui-badge>
+                    <div class="code-example">
+&lt;ui-badge designVariant="neumorphism-soft"&gt;
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Claymorphism Section -->
+        <div class="claymorphism-background">
+            <h2 class="variant-title">🧱 Claymorphism</h2>
+            <p class="variant-description">Soft, rounded, sculptural shapes like clay</p>
+            <div class="component-grid">
+                <div class="component-showcase">
+                    <div class="component-title">Card (Clay)</div>
+                    <ui-card 
+                        title="Clay Card"
+                        subtitle="Sculptural design"
+                        content="This card has soft, rounded edges with large, colored shadows."
+                        actionText="Mold Me"
+                        designVariant="claymorphism-clay">
+                    </ui-card>
+                    <div class="code-example">
+&lt;ui-card designVariant="claymorphism-clay"&gt;
+                    </div>
+                </div>
+                
+                <div class="component-showcase">
+                    <div class="component-title">Card (Layered)</div>
+                    <ui-card 
+                        title="Layered Clay Card"
+                        subtitle="Multiple clay elements"
+                        content="This card demonstrates layered claymorphism with subtle stacking effects."
+                        actionText="Layer Up"
+                        designVariant="claymorphism-layered">
+                    </ui-card>
+                    <div class="code-example">
+&lt;ui-card designVariant="claymorphism-layered"&gt;
+                    </div>
+                </div>
+                
+                <div class="component-showcase">
+                    <div class="component-title">Avatar</div>
+                    <ui-avatar src="👤" size="large" designVariant="claymorphism-clay"></ui-avatar>
+                    <div class="code-example">
+&lt;ui-avatar designVariant="claymorphism-clay"&gt;
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modern Brutalism Section -->
+        <div class="brutalism-background">
+            <h2 class="variant-title">🏗️ Modern Brutalism</h2>
+            <p class="variant-description">Raw, uncompromising design with stark contrast</p>
+            <div class="component-grid">
+                <div class="component-showcase">
+                    <div class="component-title">Card (Sharp)</div>
+                    <ui-card 
+                        title="BRUTAL CARD"
+                        subtitle="SHARP CONTRAST"
+                        content="This card uses stark black and white with bold typography and sharp edges."
+                        actionText="BOLD ACTION"
+                        designVariant="brutalism-sharp">
+                    </ui-card>
+                    <div class="code-example">
+&lt;ui-card designVariant="brutalism-sharp"&gt;
+                    </div>
+                </div>
+                
+                <div class="component-showcase">
+                    <div class="component-title">Card (Pixel)</div>
+                    <ui-card 
+                        title="PIXEL CARD"
+                        subtitle="DIGITAL ARTIFACTS"
+                        content="This card has pixelated borders and digital glitch effects."
+                        actionText="GLITCH"
+                        designVariant="brutalism-pixel">
+                    </ui-card>
+                    <div class="code-example">
+&lt;ui-card designVariant="brutalism-pixel"&gt;
+                    </div>
+                </div>
+                
+                <div class="component-showcase">
+                    <div class="component-title">Divider</div>
+                    <ui-divider 
+                        label="BRUTAL DIVIDER"
+                        designVariant="brutalism-sharp">
+                    </ui-divider>
+                    <div class="code-example">
+&lt;ui-divider designVariant="brutalism-sharp"&gt;
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Aurora/Flowing Gradients Section -->
+        <div class="aurora-background">
+            <h2 class="variant-title">🌈 Aurora / Flowing Gradients</h2>
+            <p class="variant-description">Organic, animated gradients that shift and glow</p>
+            <div class="component-grid">
+                <div class="component-showcase">
+                    <div class="component-title">Card (Vibrant)</div>
+                    <ui-card 
+                        title="Aurora Card"
+                        subtitle="Vibrant flowing gradients"
+                        content="This card features bright, animated gradients that shift and flow organically."
+                        actionText="Flow"
+                        designVariant="aurora-vibrant">
+                    </ui-card>
+                    <div class="code-example">
+&lt;ui-card designVariant="aurora-vibrant"&gt;
+                    </div>
+                </div>
+                
+                <div class="component-showcase">
+                    <div class="component-title">Card (Ethereal)</div>
+                    <ui-card 
+                        title="Ethereal Card"
+                        subtitle="Subtle gradient background"
+                        content="This card sits on a larger gradient background with ethereal transparency."
+                        actionText="Shine"
+                        designVariant="aurora-ethereal">
+                    </ui-card>
+                    <div class="code-example">
+&lt;ui-card designVariant="aurora-ethereal"&gt;
+                    </div>
+                </div>
+                
+                <div class="component-showcase">
+                    <div class="component-title">Badge</div>
+                    <ui-badge label="Aurora" designVariant="aurora-vibrant"></ui-badge>
+                    <div class="code-example">
+&lt;ui-badge designVariant="aurora-vibrant"&gt;
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Minimal Section -->
+        <div class="minimal-background">
+            <h2 class="variant-title">⚪ Minimal</h2>
+            <p class="variant-description">Clean, simple design focusing on content and typography</p>
+            <div class="component-grid">
+                <div class="component-showcase">
+                    <div class="component-title">Card (Ultra)</div>
+                    <ui-card 
+                        title="Ultra Minimal Card"
+                        subtitle="Pure simplicity"
+                        content="This card strips away all non-essential elements, focusing purely on content."
+                        actionText="Simple"
+                        designVariant="minimal-ultra">
+                    </ui-card>
+                    <div class="code-example">
+&lt;ui-card designVariant="minimal-ultra"&gt;
+                    </div>
+                </div>
+                
+                <div class="component-showcase">
+                    <div class="component-title">Card (Outline)</div>
+                    <ui-card 
+                        title="Outline Focus Card"
+                        subtitle="Elegant borders"
+                        content="This card is defined by thin, elegant outlines rather than heavy styling."
+                        actionText="Elegant"
+                        designVariant="minimal-outline">
+                    </ui-card>
+                    <div class="code-example">
+&lt;ui-card designVariant="minimal-outline"&gt;
+                    </div>
+                </div>
+                
+                <div class="component-showcase">
+                    <div class="component-title">List</div>
+                    <ui-list 
+                        items="Minimal Item 1,Minimal Item 2,Minimal Item 3"
+                        designVariant="minimal-ultra">
+                    </ui-list>
+                    <div class="code-example">
+&lt;ui-list designVariant="minimal-ultra"&gt;
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cyberpunk Section -->
+        <div class="cyberpunk-background">
+            <h2 class="variant-title">🤖 Cyberpunk</h2>
+            <p class="variant-description">Futuristic design with neon accents and digital effects</p>
+            <div class="component-grid">
+                <div class="component-showcase">
+                    <div class="component-title">Card (Neon)</div>
+                    <ui-card 
+                        title="NEON CARD"
+                        subtitle="CYBERPUNK STYLE"
+                        content="This card features glowing neon green elements with dark background."
+                        actionText="HACK"
+                        designVariant="cyberpunk-neon">
+                    </ui-card>
+                    <div class="code-example">
+&lt;ui-card designVariant="cyberpunk-neon"&gt;
+                    </div>
+                </div>
+                
+                <div class="component-showcase">
+                    <div class="component-title">Card (Glitch)</div>
+                    <ui-card 
+                        title="GLITCH CARD"
+                        subtitle="DIGITAL DISTORTION"
+                        content="This card has subtle digital glitch effects and magenta neon accents."
+                        actionText="GLITCH"
+                        designVariant="cyberpunk-glitch">
+                    </ui-card>
+                    <div class="code-example">
+&lt;ui-card designVariant="cyberpunk-glitch"&gt;
+                    </div>
+                </div>
+                
+                <div class="component-showcase">
+                    <div class="component-title">Badge</div>
+                    <ui-badge label="CYBER" designVariant="cyberpunk-neon"></ui-badge>
+                    <div class="code-example">
+&lt;ui-badge designVariant="cyberpunk-neon"&gt;
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Usage Instructions -->
+        <div class="variant-section">
+            <h2 class="variant-title">📖 How to Use Design Variants</h2>
+            <p class="variant-description">Add the designVariant attribute to any component to apply these styles</p>
+            
+            <div class="component-grid">
+                <div class="component-showcase">
+                    <h3 style="color: white; margin-bottom: 1rem;">HTML Usage</h3>
+                    <div class="code-example">
+&lt;ui-card 
+    title="My Card"
+    content="Card content"
+    designVariant="glassmorphism"&gt;
+&lt;/ui-card&gt;
+                    </div>
+                </div>
+                
+                <div class="component-showcase">
+                    <h3 style="color: white; margin-bottom: 1rem;">JavaScript API</h3>
+                    <div class="code-example">
+UI.card({
+    title: "My Card",
+    content: "Card content",
+    designVariant: "glassmorphism"
+});
+                    </div>
+                </div>
+                
+                <div class="component-showcase">
+                    <h3 style="color: white; margin-bottom: 1rem;">Visual Builder</h3>
+                    <div class="code-example">
+Use the Component Builder and select
+your preferred design variant from
+the dropdown menu.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Initialize components
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add glitch effect to cyberpunk-glitch elements
+            const glitchElements = document.querySelectorAll('.cyberpunk-glitch');
+            glitchElements.forEach(element => {
+                const text = element.textContent;
+                element.setAttribute('data-text', text);
+            });
+        });
+    </script>
+</body>
+</html>

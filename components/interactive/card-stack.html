@@ -1,0 +1,129 @@
+<!-- Card Stack (swipe/keyboard) -->
+<div class="demo-section">
+    <h2 class="demo-title">29. Card Stack</h2>
+    <ui-card-stack 
+        cards='[{"title":"Alt 1","text":"First alternative"},{"title":"Alt 2","text":"Second alternative"},{"title":"Alt 3","text":"Third alternative"}]'
+        allowSwipe="true" loop="false">
+    </ui-card-stack>
+
+    <style>
+    ui-card-stack { display:block; }
+    ui-card-stack .stage {
+        position: relative;
+        height: 380px;
+        user-select: none;
+        border: 1px solid var(--surface-3);
+        border-radius: var(--radius-size);
+        background: linear-gradient(180deg, var(--surface-1), var(--surface-2));
+        box-shadow: var(--shadow-soft);
+        overflow: hidden;
+    }
+    ui-card-stack .card {
+        position:absolute;
+        inset: 0;
+        margin: auto;
+        width: min(560px, 92%);
+        min-height: 260px;
+        background: var(--surface-1);
+        border:1px solid var(--surface-3);
+        border-radius: calc(var(--radius-size) + 2px);
+        padding: clamp(16px, 3vw, 24px);
+        box-shadow: var(--shadow-medium);
+        display:flex;
+        flex-direction:column;
+        gap: var(--size-2);
+        transition: transform .18s var(--animation-smooth), opacity .18s var(--animation-smooth);
+        will-change: transform;
+    }
+    ui-card-stack .title { font-weight:700; font-size: 1.05rem; }
+    ui-card-stack .text { color: var(--text-1); line-height:1.65; }
+    ui-card-stack .tag {
+        position:absolute; top: 14px; padding: 6px 10px; border-radius: 10px;
+        font-weight:800; letter-spacing:.6px; font-size: .8rem; text-transform: uppercase;
+        opacity: 0; transform: rotate(-4deg) scale(.94);
+        transition: opacity .15s var(--animation-smooth), transform .15s var(--animation-smooth);
+        background: color-mix(in oklab, var(--surface-2) 70%, transparent);
+        backdrop-filter: blur(3px);
+    }
+    ui-card-stack .tag.accept { left: 14px; color: hsl(142 76% 36%); border:2px solid hsl(142 76% 36%); }
+    ui-card-stack .tag.reject { right: 14px; color: hsl(0 84% 60%); border:2px solid hsl(0 84% 60%); transform: rotate(4deg) scale(.94); }
+    ui-card-stack .controls { margin-top: .75rem; display:flex; justify-content:center; gap: .5rem; }
+    ui-card-stack .btn { width:42px; height:36px; border:1px solid var(--surface-3); border-radius: 10px; background: var(--surface-2); cursor:pointer; display:inline-flex; align-items:center; justify-content:center; transition: transform .12s var(--animation-smooth), box-shadow .12s var(--animation-smooth); }
+    ui-card-stack .btn:hover { transform: translateY(-1px); box-shadow: var(--shadow-soft); }
+    </style>
+
+    <script>
+    function initCardStacks(){
+        document.querySelectorAll('ui-card-stack').forEach(root => {
+            const cards = safeParseJSON(root.getAttribute('cards')) || [];
+            const allowSwipe = root.getAttribute('allowSwipe') === 'true';
+            const loop = root.getAttribute('loop') === 'true';
+            let html = '<div class="stage">' + cards.map((c,i)=>`<article class="card" data-index="${i}"><div class="tag accept">ACCEPT</div><div class="tag reject">REJECT</div><div class="title">${escapeHtml(c.title||'')}</div><div class="text">${escapeHtml(c.text||'')}</div></article>`).join('') + '</div>';
+            html += '<div class="controls"><button class="btn prev">⟵</button><button class="btn next">⟶</button></div>';
+            root.innerHTML = html;
+            const stage = root.querySelector('.stage');
+            function next(){ const first = stage.firstElementChild; if(!first) return; fling(first, 1); }
+            function prev(){ const first = stage.firstElementChild; if(!first) return; fling(first, -1); }
+            function resetStack(){ [...stage.children].forEach((el,i)=>{ el.style.transform = 'translateX(0) rotate(0)'; el.style.opacity = i===0 ? '1' : '0'; el.style.zIndex = `${999 - i}`; }); }
+            function fling(card, dir){
+                card.style.transition = 'transform .2s ease, opacity .2s ease';
+                card.style.transform = `translateX(${dir*120}px) rotate(${dir*4}deg)`;
+                card.style.opacity = '0';
+                setTimeout(()=>{
+                    stage.appendChild(card);
+                    card.style.transition = '';
+                    card.style.transform = '';
+                    card.style.opacity = '';
+                    resetStack();
+                }, 200);
+            }
+            root.querySelector('.next').addEventListener('click', next);
+            root.querySelector('.prev').addEventListener('click', prev);
+            if(allowSwipe){
+                let dragging=false, startX=0, currentX=0; let active=null;
+                const threshold = 60;
+                stage.addEventListener('pointerdown', e=>{
+                    active = stage.firstElementChild; if(!active) return;
+                    dragging=true; startX=e.clientX; currentX=startX; active.setPointerCapture(e.pointerId);
+                    active.style.transition='none';
+                    // hide the rest while dragging to avoid peeking
+                    [...stage.children].forEach((el,i)=>{ if(i>0){ el.style.opacity = '0'; }});
+                });
+                stage.addEventListener('pointermove', e=>{
+                    if(!dragging||!active) return; currentX=e.clientX; const dx=currentX-startX; const rot = dx/20; const op = Math.max(0.2, 1 - Math.abs(dx)/240);
+                    active.style.transform = `translateX(${dx}px) rotate(${rot}deg)`; active.style.opacity = op;
+                    const acceptTag = active.querySelector('.tag.accept'); const rejectTag = active.querySelector('.tag.reject');
+                    if(acceptTag && rejectTag){
+                        const showAccept = dx>threshold/2; const showReject = dx<-threshold/2;
+                        acceptTag.style.opacity = showAccept?1:0; acceptTag.style.transform = `scale(${showAccept?1:0.95})`;
+                        rejectTag.style.opacity = showReject?1:0; rejectTag.style.transform = `scale(${showReject?1:0.95})`;
+                    }
+                });
+                stage.addEventListener('pointerup', e=>{
+                    if(!dragging||!active) return; const dx=e.clientX-startX; const dir = dx>threshold?1:dx<-threshold?-1:0;
+                    const acceptTag = active.querySelector('.tag.accept'); const rejectTag = active.querySelector('.tag.reject');
+                    if(dir!==0){
+                        // fling away
+                        active.style.transition='transform .2s ease, opacity .2s ease';
+                        active.style.transform = `translateX(${dir*160}px) rotate(${dir*6}deg)`; active.style.opacity = '0';
+                        setTimeout(()=>{ stage.appendChild(active); active.style.transition=''; active.style.transform=''; active.style.opacity=''; resetStack(); }, 200);
+                    } else {
+                        // restore
+                        active.style.transition='transform .15s ease, opacity .15s ease'; active.style.transform='translateX(0) rotate(0)'; active.style.opacity='1';
+                        setTimeout(()=>{ active.style.transition=''; }, 160);
+                    }
+                    if(acceptTag){ acceptTag.style.opacity = 0; acceptTag.style.transform = 'scale(.95)'; }
+                    if(rejectTag){ rejectTag.style.opacity = 0; rejectTag.style.transform = 'scale(.95)'; }
+                    dragging=false; active=null;
+                });
+            }
+            resetStack();
+        });
+    }
+    function safeParseJSON(str){ try { return JSON.parse(str); } catch { return null; } }
+    function escapeHtml(text){ const div=document.createElement('div'); div.textContent=text||''; return div.innerHTML; }
+    document.addEventListener('DOMContentLoaded', initCardStacks);
+    </script>
+</div>
+
+
