@@ -103,7 +103,7 @@
 
         .iframe-container {
             width: 100%;
-            height: 70vh;
+            height: 80vh;
             border: none;
             border-radius: 0.5rem;
         }
@@ -306,6 +306,8 @@
             <button class="tab active" onclick="switchTab('builder')">Visual Builder</button>
             <button class="tab" onclick="switchTab('docs')">Documentation</button>
             <button class="tab" onclick="switchTab('display')">Component Display</button>
+            <button class="tab" onclick="switchTab('variants')">Design Variants</button>
+            <button class="tab" onclick="switchTab('llm')">LLM Demo</button>
         </div>
 
         <div id="builder" class="tab-content active">
@@ -755,6 +757,18 @@
         <div id="display" class="tab-content">
             <div class="content-area">
                 <iframe src="components/index.html" class="iframe-container"></iframe>
+            </div>
+        </div>
+
+        <div id="variants" class="tab-content">
+            <div class="content-area">
+                <iframe src="design-variants-demo.html" class="iframe-container"></iframe>
+            </div>
+        </div>
+
+        <div id="llm" class="tab-content">
+            <div class="content-area">
+                <iframe src="llm-demo.html" class="iframe-container"></iframe>
             </div>
         </div>
     </div>

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gen UI – LLM Renderer Demo</title>
+  <link rel="stylesheet" href="components/component-styles.css" />
+  <script type="module" src="components/simple-components.js"></script>
+  <script src="core/gen-registry.js"></script>
+  <script src="core/sanitizer.js"></script>
+  <script src="core/llm-renderer.js"></script>
+  <style>
+    :root { --brand-hue: 25; }
+    body { font-family: Inter, system-ui, sans-serif; background: #fafafa; margin: 0; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+    textarea { width: 100%; min-height: 140px; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .panel { background: white; border: 1px solid #e5e7eb; border-radius: 12px; padding: 1rem; }
+    .out { min-height: 240px; padding: 1rem; background: #fff; border: 1px dashed #ddd; border-radius: 12px; }
+    .actions { display:flex; gap: 0.75rem; margin: 0.75rem 0; }
+    button { padding: 0.5rem 0.9rem; border-radius: 8px; border: 1px solid #ddd; background: #111; color: #fff; cursor: pointer; }
+  </style>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/chota@latest">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script type="module">
+    import '../ui_component_demo/components/simple-components.js';
+  </script>
+</head>
+<body>
+  <div class="container">
+    <h1>Gen UI – LLM to UI Renderer</h1>
+    <p>Paste or stream model output containing allowed tags like <code>&lt;ui-card&gt;</code> and render them safely.</p>
+
+    <div class="row">
+      <div class="panel">
+        <h3>LLM Output (HTML-like)</h3>
+        <textarea id="input">&lt;ui-card title="Welcome" designVariant="glassmorphism"&gt;Hello World&lt;/ui-card&gt;
+&lt;ui-ticker lines='["Breaking", "News", "Updates"]'&gt;&lt;/ui-ticker&gt;
+&lt;ui-map locations="New York,40.7128,-74.0060;London,51.5074,-0.1278" center="40.7128,-74.0060" zoom="1" height="280px" showMarkers="true"&gt;&lt;/ui-map&gt;</textarea>
+        <div class="actions">
+          <button onclick="render()">Render</button>
+          <button onclick="clearOut()">Clear</button>
+        </div>
+      </div>
+      <div class="panel">
+        <h3>Rendered</h3>
+        <div id="out" class="out"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function clearOut(){ document.getElementById('out').innerHTML = ''; }
+    async function render(){
+      const text = document.getElementById('input').value;
+      await window.GenUIRenderer.renderFromText(document.getElementById('out'), text);
+    }
+  </script>
+</body>
+</html>
+
+
